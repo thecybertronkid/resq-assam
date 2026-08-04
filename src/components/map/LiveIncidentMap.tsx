@@ -15,7 +15,8 @@ import {
   ExternalLink,
   Phone,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  Info
 } from 'lucide-react';
 
 export const LiveIncidentMap: React.FC = () => {
@@ -27,16 +28,19 @@ export const LiveIncidentMap: React.FC = () => {
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedItem, setSelectedItem] = useState<{ type: 'incident' | 'camp' | 'road'; data: any } | null>(null);
+  const [showCtrlHint, setShowCtrlHint] = useState(false);
 
   // Initialize Leaflet map centered on Assam
   useEffect(() => {
     if (!mapContainerRef.current) return;
     if (leafletMapRef.current) return;
 
+    // Initialize map with scrollWheelZoom: false to prevent accidental scrolling zoom
     const map = L.map(mapContainerRef.current, {
       center: [26.2006, 92.9376],
       zoom: 8,
-      zoomControl: false
+      zoomControl: false,
+      scrollWheelZoom: false
     });
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -49,6 +53,29 @@ export const LiveIncidentMap: React.FC = () => {
 
     leafletMapRef.current = map;
 
+    // Ctrl + Scroll Zoom Handler
+    const container = mapContainerRef.current;
+    let hintTimeout: any = null;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        if (leafletMapRef.current) {
+          if (e.deltaY < 0) {
+            leafletMapRef.current.zoomIn();
+          } else if (e.deltaY > 0) {
+            leafletMapRef.current.zoomOut();
+          }
+        }
+      } else {
+        setShowCtrlHint(true);
+        if (hintTimeout) clearTimeout(hintTimeout);
+        hintTimeout = setTimeout(() => setShowCtrlHint(false), 2000);
+      }
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
     // Trigger map resize recalculation after DOM render
     const timer = setTimeout(() => {
       map.invalidateSize();
@@ -56,6 +83,8 @@ export const LiveIncidentMap: React.FC = () => {
 
     return () => {
       clearTimeout(timer);
+      if (hintTimeout) clearTimeout(hintTimeout);
+      container.removeEventListener('wheel', handleWheel);
       if (leafletMapRef.current) {
         leafletMapRef.current.remove();
         leafletMapRef.current = null;
@@ -190,6 +219,14 @@ export const LiveIncidentMap: React.FC = () => {
           <span>Pin Emergency SOS</span>
         </button>
       </div>
+
+      {/* Ctrl + Scroll Zoom Overlay Hint */}
+      {showCtrlHint && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[700] bg-slate-900/90 backdrop-blur-md text-white font-bold text-xs px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 animate-fade-in border border-slate-700 pointer-events-none">
+          <Info className="w-4 h-4 text-sky-400" />
+          <span>Use <kbd className="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-600">Ctrl</kbd> + scroll to zoom the map</span>
+        </div>
+      )}
 
       {/* Map Element Container */}
       <div ref={mapContainerRef} className="w-full h-full z-10 min-h-[550px]" />
