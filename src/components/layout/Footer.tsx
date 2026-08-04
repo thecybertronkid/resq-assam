@@ -1,7 +1,15 @@
 import React from 'react';
+import { useApp } from '../../context/AppContext';
 import { ShieldAlert, Phone, HeartHandshake } from 'lucide-react';
 
 export const Footer: React.FC = () => {
+  const { setActiveTab, setIsSosModalOpen, setRole } = useApp();
+
+  const handleNav = (action: () => void) => {
+    action();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <footer className="bg-white border-t border-slate-200 text-slate-600 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -52,16 +60,58 @@ export const Footer: React.FC = () => {
           </ul>
         </div>
 
-        {/* Quick Links */}
+        {/* Interactive Disaster Modules Links */}
         <div className="space-y-3">
           <h4 className="text-slate-900 text-xs font-extrabold uppercase tracking-wider">Disaster Modules</h4>
-          <ul className="space-y-1.5 text-xs text-slate-600">
-            <li><a href="#sos" className="hover:text-pink-600 transition-colors">Submit Emergency SOS Report</a></li>
-            <li><a href="#map" className="hover:text-pink-600 transition-colors">Live Brahmaputra Water Levels & Map</a></li>
-            <li><a href="#camps" className="hover:text-pink-600 transition-colors">Relief Camp Occupancy Tracker</a></li>
-            <li><a href="#missing" className="hover:text-pink-600 transition-colors">Missing Persons Database & Search</a></li>
-            <li><a href="#volunteer" className="hover:text-pink-600 transition-colors">Register as Swimmer / Medical Volunteer</a></li>
-            <li><a href="#donate" className="hover:text-pink-600 transition-colors">Tax-Exempt Relief Fund Donations</a></li>
+          <ul className="space-y-2 text-xs text-slate-600">
+            <li>
+              <button
+                onClick={() => handleNav(() => setIsSosModalOpen(true))}
+                className="hover:text-pink-600 font-semibold transition-colors text-left flex items-center gap-1.5"
+              >
+                <span className="text-pink-500 font-bold">›</span> Submit Emergency SOS Report
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNav(() => setActiveTab('map'))}
+                className="hover:text-pink-600 font-semibold transition-colors text-left flex items-center gap-1.5"
+              >
+                <span className="text-pink-500 font-bold">›</span> Live Brahmaputra Water Levels & Map
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNav(() => setActiveTab('camps'))}
+                className="hover:text-pink-600 font-semibold transition-colors text-left flex items-center gap-1.5"
+              >
+                <span className="text-pink-500 font-bold">›</span> Relief Camp Occupancy Tracker
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNav(() => setActiveTab('missing'))}
+                className="hover:text-pink-600 font-semibold transition-colors text-left flex items-center gap-1.5"
+              >
+                <span className="text-pink-500 font-bold">›</span> Missing Persons Database & Search
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNav(() => { setRole('volunteer'); setActiveTab('volunteer'); })}
+                className="hover:text-pink-600 font-semibold transition-colors text-left flex items-center gap-1.5"
+              >
+                <span className="text-pink-500 font-bold">›</span> Register as Swimmer / Medical Volunteer
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNav(() => setActiveTab('donations'))}
+                className="hover:text-pink-600 font-semibold transition-colors text-left flex items-center gap-1.5"
+              >
+                <span className="text-pink-500 font-bold">›</span> Tax-Exempt Relief Fund Donations
+              </button>
+            </li>
           </ul>
         </div>
 
