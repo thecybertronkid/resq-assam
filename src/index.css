@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color-scheme: light;
 }
 
@@ -10,67 +10,80 @@ body {
   background-color: #f8fafc;
   color: #0f172a;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, .font-heading {
   font-family: 'Outfit', 'Inter', sans-serif;
+  letter-spacing: -0.02em;
 }
 
-/* Glassmorphism light panel styling */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(244, 114, 182, 0.2);
-  box-shadow: 0 10px 30px -5px rgba(236, 72, 153, 0.08);
+/* Smooth Bezier Transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.glass-card {
+/* Decluttered Card Styling */
+.card-clean {
   background: #ffffff;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+  border: 1px solid #e2e8f0;
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s ease;
 }
 
-.glass-card:hover {
-  border-color: rgba(236, 72, 153, 0.4);
-  box-shadow: 0 12px 30px -4px rgba(236, 72, 153, 0.12);
+.card-clean:hover {
+  border-color: #f472b6;
+  box-shadow: 0 10px 25px -5px rgba(244, 114, 182, 0.12), 0 8px 10px -6px rgba(244, 114, 182, 0.06);
+  transform: translateY(-2px);
 }
 
-/* Pulse SOS Animation - Vibrant Pink/Coral */
-@keyframes emergencyPulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.6);
-  }
-  70% {
-    box-shadow: 0 0 0 16px rgba(244, 63, 94, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
-  }
+/* Glassmorphism Panel */
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* Smooth Fade Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Pulse SOS Animation */
+@keyframes sosGlow {
+  0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.5); }
+  70% { box-shadow: 0 0 0 14px rgba(244, 63, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
 }
 
 .animate-sos-pulse {
-  animation: emergencyPulse 1.8s infinite;
+  animation: sosGlow 2s infinite;
 }
 
-/* Ticker Scroll Animation */
-@keyframes ticker {
+/* Smooth Ticker Scroll */
+@keyframes tickerScroll {
   0% { transform: translate3d(0, 0, 0); }
   100% { transform: translate3d(-50%, 0, 0); }
 }
 
-.animate-ticker {
+.animate-ticker-smooth {
   display: inline-flex;
   white-space: nowrap;
-  animation: ticker 28s linear infinite;
+  animation: tickerScroll 35s linear infinite;
 }
 
-.animate-ticker:hover {
+.animate-ticker-smooth:hover {
   animation-play-state: paused;
 }
 
-/* Custom Light Scrollbar */
+/* Custom Clean Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -80,45 +93,45 @@ h1, h2, h3, h4, .font-heading {
 }
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 3px;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #ec4899;
+  background: #f472b6;
 }
 
-/* Leaflet map custom styling for Light Mode */
+/* Leaflet map styling */
 .leaflet-container {
   width: 100%;
   height: 100%;
   background: #f8fafc !important;
-  border-radius: 0.75rem;
+  border-radius: 1rem;
 }
 
 .leaflet-popup-content-wrapper {
   background: #ffffff !important;
   color: #0f172a !important;
-  border: 1px solid #fbcfe8 !important;
-  border-radius: 0.75rem !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08) !important;
 }
 
 .leaflet-popup-tip {
   background: #ffffff !important;
 }
 
-/* Status Badges - Light Pastel Palette */
+/* Status Badges */
 .badge-critical {
-  @apply bg-rose-100 text-rose-700 border border-rose-300 font-semibold px-2.5 py-0.5 rounded-full text-xs animate-pulse;
+  @apply bg-rose-50 text-rose-700 border border-rose-200 font-semibold px-2.5 py-0.5 rounded-full text-xs animate-pulse;
 }
 
 .badge-high {
-  @apply bg-amber-100 text-amber-800 border border-amber-300 font-semibold px-2.5 py-0.5 rounded-full text-xs;
+  @apply bg-amber-50 text-amber-800 border border-amber-200 font-semibold px-2.5 py-0.5 rounded-full text-xs;
 }
 
 .badge-medium {
-  @apply bg-sky-100 text-sky-800 border border-sky-300 font-semibold px-2.5 py-0.5 rounded-full text-xs;
+  @apply bg-sky-50 text-sky-700 border border-sky-200 font-semibold px-2.5 py-0.5 rounded-full text-xs;
 }
 
 .badge-low {
-  @apply bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold px-2.5 py-0.5 rounded-full text-xs;
+  @apply bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold px-2.5 py-0.5 rounded-full text-xs;
 }
