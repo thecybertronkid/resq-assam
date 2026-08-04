@@ -24,6 +24,7 @@ import { detectDuplicateIncident, calculateAiVulnerabilityScore } from '../utils
 import { saveSosToOfflineQueue, getOfflineSosQueue, clearOfflineSosQueue } from '../utils/offlineSync';
 import { AsdmaSyncEngine, LiveTelemetryStatus } from '../utils/asdmaSyncEngine';
 import { dbService } from '../utils/databaseService';
+import { supabaseClient } from '../utils/supabaseClient';
 
 interface AppContextType {
   role: UserRole;
@@ -89,7 +90,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Live Telemetry Sync State
   const [telemetry, setTelemetry] = useState<LiveTelemetryStatus>(AsdmaSyncEngine.getInstance().getTelemetry());
 
-  // DATABASE INITIALIZATION & HYDRATION FROM INDEXEDDB
+  // DATABASE INITIALIZATION & HYDRATION FROM INDEXEDDB & SUPABASE
   useEffect(() => {
     const loadDatabaseState = async () => {
       try {
@@ -134,7 +135,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const handleOnline = () => {
       setIsOnline(true);
-      showToast('🟢 Back Online! Synchronizing offline emergency reports with ASDMA & Axom Relief servers...');
+      showToast('🟢 Back Online! Synchronizing offline emergency reports with Supabase & ASDMA servers...');
       const queue = getOfflineSosQueue();
       if (queue.length > 0) {
         queue.forEach((qReport: Partial<IncidentReport>) => {
@@ -189,6 +190,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const updatedVol = { ...activeVerifiedVol, tasksAssigned: activeVerifiedVol.tasksAssigned + 1 };
         setVolunteers(prev => prev.map(v => v.id === activeVerifiedVol.id ? updatedVol : v));
         dbService.saveVolunteer(updatedVol);
+        supabaseClient.syncVolunteer(updatedVol);
 
         showToast(`🚨 CRITICAL DISPATCH: Auto-assigned to nearest ASDMA Verified Volunteer [${activeVerifiedVol.name}] in ${activeVerifiedVol.district}!`);
       }
@@ -223,9 +225,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       showToast(`💾 Offline Mode: Report ${id} stored in local IndexedDB. Will sync when back online.`);
     } else {
       setIncidents(prev => [fullReport, ...prev]);
-      dbService.saveIncident(fullReport); // PERSIST TO DATABASE
+      dbService.saveIncident(fullReport); // PERSIST TO INDEXEDDB
+      supabaseClient.syncIncident(fullReport); // SYNC TO SUPABASE POSTGRESQL
+
       if (initialStatus === 'submitted') {
-        showToast(`🆘 SOS Report ${id} submitted & saved to database! Transmitted to ASDMA & NDRF Patgaon Control Room.`);
+        showToast(`🆘 SOS Report ${id} submitted & synced to Supabase database! Transmitted to ASDMA & NDRF Patgaon Control Room.`);
       }
     }
   };
@@ -246,17 +250,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           assignedTeamName: teamName || inc.assignedTeamName,
           rescuePhotoProof: rescuePhotoProof || inc.rescuePhotoProof
         };
-        dbService.saveIncident(updated); // PERSIST UPDATE TO DATABASE
+        dbService.saveIncident(updated);
+        supabaseClient.syncIncident(updated);
         return updated;
       }
       return inc;
     }));
-    showToast(`🚁 Incident ${id} status updated to [${status.toUpperCase()}] & saved to database!`);
+    showToast(`🚁 Incident ${id} status updated to [${status.toUpperCase()}] & synced to Supabase database!`);
   };
 
   const addCamp = (camp: ReliefCamp) => {
     setCamps(prev => [camp, ...prev]);
-    dbService.saveCamp(camp); // PERSIST TO DATABASE
+    dbService.saveCamp(camp);
     showToast(`⛺ Registered new relief camp "${camp.name}" in ${camp.district}! Saved to database.`);
   };
 
@@ -264,7 +269,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCamps(prev => prev.map(c => {
       if (c.id === campId) {
         const updated = { ...c, currentOccupancy: occupancy };
-        dbService.saveCamp(updated); // PERSIST TO DATABASE
+        dbService.saveCamp(updated);
         return updated;
       }
       return c;
@@ -280,25 +285,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       tasksAssigned: 0
     };
     setVolunteers(prev => [newVol, ...prev]);
-    dbService.saveVolunteer(newVol); // PERSIST TO DATABASE
-    showToast(`🦺 Volunteer application for ${newVol.name} submitted & saved to database! Pending ASDMA Govt Admin verification.`);
+    dbService.saveVolunteer(newVol);
+    supabaseClient.syncVolunteer(newVol);
+    showToast(`🦺 Volunteer application for ${newVol.name} submitted & synced to Supabase database! Pending ASDMA Govt Admin verification.`);
   };
 
   const verifyVolunteer = (volId: string) => {
     setVolunteers(prev => prev.map(v => {
       if (v.id === volId) {
         const updated = { ...v, isVerified: true };
-        dbService.saveVolunteer(updated); // PERSIST TO DATABASE
+        dbService.saveVolunteer(updated);
+        supabaseClient.syncVolunteer(updated);
         return updated;
       }
       return v;
     }));
-    showToast(`✅ ASDMA Govt Admin verified volunteer credential for ${volId}! Saved to database.`);
+    showToast(`✅ ASDMA Govt Admin verified volunteer credential for ${volId}! Saved to Supabase database.`);
   };
 
   const addNGO = (ngo: NGOInventory) => {
     setNgos(prev => [ngo, ...prev]);
-    dbService.saveNGO(ngo); // PERSIST TO DATABASE
+    dbService.saveNGO(ngo);
     showToast(`📦 Registered NGO warehouse "${ngo.ngoName}" in database!`);
   };
 
@@ -314,7 +321,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           distributionCount: n.distributionCount + 1,
           lastUpdated: new Date().toLocaleTimeString()
         };
-        dbService.saveNGO(updated); // PERSIST TO DATABASE
+        dbService.saveNGO(updated);
         return updated;
       }
       return n;
@@ -327,7 +334,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: `MP-${Math.floor(1000 + Math.random() * 9000)}`
     };
     setMissingPersons(prev => [newPerson, ...prev]);
-    dbService.saveMissingPerson(newPerson); // PERSIST TO DATABASE
+    dbService.saveMissingPerson(newPerson);
     showToast(`🔍 Missing person report for "${newPerson.fullName}" published & saved to database!`);
   };
 
@@ -338,7 +345,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       reportedAt: new Date().toLocaleTimeString()
     };
     setRoadReports(prev => [newRoad, ...prev]);
-    dbService.saveRoadReport(newRoad); // PERSIST TO DATABASE
+    dbService.saveRoadReport(newRoad);
     showToast(`🚧 Road obstacle report for "${newRoad.roadName}" published & saved to database!`);
   };
 
@@ -350,8 +357,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       timestamp: new Date().toLocaleDateString()
     };
     setDonations(prev => [newDonation, ...prev]);
-    dbService.saveDonation(newDonation); // PERSIST TO DATABASE
-    showToast(`🎉 Thank you ${newDonation.donorName}! Official 80G E-Receipt #${newDonation.receiptNo} saved to database.`);
+    dbService.saveDonation(newDonation);
+    supabaseClient.syncDonation(newDonation);
+    showToast(`🎉 Thank you ${newDonation.donorName}! Official 80G E-Receipt #${newDonation.receiptNo} saved to Supabase database.`);
   };
 
   return (
