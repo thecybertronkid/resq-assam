@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background-color: #090d16;
+  color: #f1f5f9;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+/* Glassmorphism panel styling */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-card:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Pulse SOS Animation */
+@keyframes emergencyPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(220, 38, 38, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+  }
+}
+
+.animate-sos-pulse {
+  animation: emergencyPulse 1.8s infinite;
+}
+
+/* Ticker Scroll Animation */
+@keyframes ticker {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+.animate-ticker {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: ticker 28s linear infinite;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b1120;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
+}
+
+/* Leaflet map custom styling */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: #090d16 !important;
+  border-radius: 0.75rem;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1px solid #334155 !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-popup-tip {
+  background: #0f172a !important;
+}
+
+/* Status Badges */
+.badge-critical {
+  @apply bg-red-950/80 text-red-400 border border-red-800/60 font-semibold px-2.5 py-0.5 rounded-full text-xs animate-pulse;
+}
+
+.badge-high {
+  @apply bg-amber-950/80 text-amber-400 border border-amber-800/60 font-semibold px-2.5 py-0.5 rounded-full text-xs;
+}
+
+.badge-medium {
+  @apply bg-blue-950/80 text-blue-400 border border-blue-800/60 font-semibold px-2.5 py-0.5 rounded-full text-xs;
+}
+
+.badge-low {
+  @apply bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 font-semibold px-2.5 py-0.5 rounded-full text-xs;
+}
