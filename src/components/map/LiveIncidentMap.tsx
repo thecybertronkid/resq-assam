@@ -16,11 +16,15 @@ import {
   Phone,
   CheckCircle,
   AlertTriangle,
-  Info
+  Info,
+  Radio,
+  Package,
+  Building,
+  ArrowRight
 } from 'lucide-react';
 
 export const LiveIncidentMap: React.FC = () => {
-  const { incidents, camps, roadReports, setIsSosModalOpen } = useApp();
+  const { incidents, camps, roadReports, setIsSosModalOpen, role, setActiveTab, showToast } = useApp();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
 
@@ -210,14 +214,54 @@ export const LiveIncidentMap: React.FC = () => {
           </div>
         </div>
 
-        {/* Quick Report Floating CTA */}
-        <button
-          onClick={() => setIsSosModalOpen(true)}
-          className="pointer-events-auto bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-pink-500/20 border border-rose-300 animate-sos-pulse"
-        >
-          <ShieldAlert className="w-4 h-4" />
-          <span>Pin Emergency SOS</span>
-        </button>
+        {/* Role-Specific Map Action Button */}
+        <div className="pointer-events-auto flex items-center gap-2">
+          {role === 'rescue' && (
+            <button
+              onClick={() => setActiveTab('rescue')}
+              className="bg-rose-600 hover:bg-rose-500 text-white font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg border border-rose-300"
+            >
+              <ShieldAlert className="w-4 h-4" />
+              <span>Tactical Triage Queue</span>
+            </button>
+          )}
+          {role === 'volunteer' && (
+            <button
+              onClick={() => setActiveTab('volunteer')}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg border border-emerald-300"
+            >
+              <Radio className="w-4 h-4" />
+              <span>Volunteer Field Tasks</span>
+            </button>
+          )}
+          {role === 'ngo' && (
+            <button
+              onClick={() => setActiveTab('ngo')}
+              className="bg-purple-600 hover:bg-purple-500 text-white font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg border border-purple-300"
+            >
+              <Package className="w-4 h-4" />
+              <span>Relief Warehouse Stock</span>
+            </button>
+          )}
+          {role === 'admin' && (
+            <button
+              onClick={() => setActiveTab('admin')}
+              className="bg-amber-600 hover:bg-amber-500 text-white font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg border border-amber-300"
+            >
+              <Building className="w-4 h-4" />
+              <span>ASDMA War Room</span>
+            </button>
+          )}
+          {role === 'citizen' && (
+            <button
+              onClick={() => setIsSosModalOpen(true)}
+              className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg border border-rose-300 animate-sos-pulse"
+            >
+              <ShieldAlert className="w-4 h-4" />
+              <span>Pin Emergency SOS</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Ctrl + Scroll Zoom Overlay Hint */}
@@ -291,19 +335,50 @@ export const LiveIncidentMap: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="space-y-1 text-xs text-slate-600 font-medium">
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-3.5 h-3.5 text-sky-600" />
-                      <span>Reporter: {inc.reporterName} ({inc.reporterPhone})</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Status: <strong className="text-emerald-700 uppercase font-bold">{inc.status}</strong></span>
-                    </div>
-                    {inc.assignedTeamName && (
-                      <div className="text-xs bg-sky-50 border border-sky-200 p-2 rounded-lg text-sky-800 font-bold">
-                        Assigned Unit: {inc.assignedTeamName}
-                      </div>
+                  {/* Role Tailored Action Box */}
+                  <div className="p-3 rounded-xl border bg-pink-50/60 border-pink-200 space-y-2">
+                    <span className="text-[10px] uppercase font-bold text-pink-700 block">
+                      Active Role Action ({role.toUpperCase()}):
+                    </span>
+                    {role === 'rescue' && (
+                      <button
+                        onClick={() => { setActiveTab('rescue'); showToast(`🚁 Assigned Boat Unit to Incident ${inc.id}!`); }}
+                        className="w-full bg-rose-600 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1.5"
+                      >
+                        Assign NDRF Boat Unit →
+                      </button>
+                    )}
+                    {role === 'volunteer' && (
+                      <button
+                        onClick={() => showToast(`🦺 Volunteer accepted task for Incident ${inc.id}!`)}
+                        className="w-full bg-emerald-600 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1.5"
+                      >
+                        Accept Field Volunteer Task →
+                      </button>
+                    )}
+                    {role === 'ngo' && (
+                      <button
+                        onClick={() => { setActiveTab('ngo'); showToast(`📦 Allocated 100 ration kits for Incident ${inc.id}!`); }}
+                        className="w-full bg-purple-600 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1.5"
+                      >
+                        Allocate Relief Ration →
+                      </button>
+                    )}
+                    {role === 'admin' && (
+                      <button
+                        onClick={() => { setActiveTab('admin'); showToast(`🏛️ Moderate AI Duplicate Flag for ${inc.id}!`); }}
+                        className="w-full bg-amber-600 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1.5"
+                      >
+                        Moderate AI Duplicate Flag →
+                      </button>
+                    )}
+                    {role === 'citizen' && (
+                      <button
+                        onClick={() => showToast(`🆘 Requesting priority evacuation for ${inc.id}...`)}
+                        className="w-full bg-sky-600 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1.5"
+                      >
+                        Request Priority Evacuation →
+                      </button>
                     )}
                   </div>
                 </div>

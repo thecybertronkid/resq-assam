@@ -18,7 +18,10 @@ import {
   PhoneCall,
   BarChart3,
   ChevronDown,
-  Wifi
+  Wifi,
+  Package,
+  Radio,
+  Building
 } from 'lucide-react';
 import { UserRole } from '../../types';
 
@@ -35,33 +38,80 @@ export const Header: React.FC = () => {
     setIsAiDrawerOpen,
     alerts,
     isOnline,
-    telemetry
+    telemetry,
+    showToast
   } = useApp();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
 
-  const roleLabels: Record<UserRole, { title: string; badgeColor: string }> = {
-    citizen: { title: 'Citizen Mode', badgeColor: 'bg-sky-50 text-sky-700 border-sky-200' },
-    volunteer: { title: 'Volunteer Portal', badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    ngo: { title: 'NGO Hub', badgeColor: 'bg-purple-50 text-purple-700 border-purple-200' },
-    rescue: { title: 'Rescue Command', badgeColor: 'bg-rose-50 text-rose-700 border-rose-200' },
-    admin: { title: 'Govt Admin', badgeColor: 'bg-amber-50 text-amber-800 border-amber-200' }
+  // Dynamic Role Configs
+  const roleConfigs: Record<UserRole, { 
+    title: string; 
+    dashLabel: string;
+    dashTab: string;
+    badgeColor: string; 
+    ctaLabel: string;
+    ctaIcon: any;
+    ctaAction: () => void;
+  }> = {
+    citizen: { 
+      title: 'Citizen Mode', 
+      dashLabel: 'My SOS Dispatches',
+      dashTab: 'citizen',
+      badgeColor: 'bg-sky-50 text-sky-700 border-sky-200',
+      ctaLabel: 'SOS EMERGENCY',
+      ctaIcon: PhoneCall,
+      ctaAction: () => setIsSosModalOpen(true)
+    },
+    volunteer: { 
+      title: 'Volunteer Portal', 
+      dashLabel: 'Volunteer Corps',
+      dashTab: 'volunteer',
+      badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      ctaLabel: 'RADIO CHECK-IN',
+      ctaIcon: Radio,
+      ctaAction: () => { setActiveTab('volunteer'); showToast('🦺 Volunteer GPS & Telemetry Check-In Broadcast Sent!'); }
+    },
+    ngo: { 
+      title: 'NGO Hub', 
+      dashLabel: 'Relief Inventory',
+      dashTab: 'ngo',
+      badgeColor: 'bg-purple-50 text-purple-700 border-purple-200',
+      ctaLabel: 'DISPATCH SUPPLIES',
+      ctaIcon: Package,
+      ctaAction: () => { setActiveTab('ngo'); showToast('📦 NGO Relief Supply Warehouse Form Opened!'); }
+    },
+    rescue: { 
+      title: 'Rescue Command', 
+      dashLabel: 'Tactical Triage',
+      dashTab: 'rescue',
+      badgeColor: 'bg-rose-50 text-rose-700 border-rose-200',
+      ctaLabel: 'DEPLOY BOAT UNIT',
+      ctaIcon: ShieldAlert,
+      ctaAction: () => { setActiveTab('rescue'); showToast('🚁 Tactical Rescue Command Queue Opened!'); }
+    },
+    admin: { 
+      title: 'Govt Admin', 
+      dashLabel: 'ASDMA War Room',
+      dashTab: 'admin',
+      badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+      ctaLabel: 'STATEWIDE ALERT',
+      ctaIcon: Building,
+      ctaAction: () => { setActiveTab('admin'); showToast('🏛️ ASDMA Statewide Emergency Broadcast Panel Loaded!'); }
+    }
   };
 
-  // Ultra-clean 4 Primary Nav Tabs
+  const currentRoleCfg = roleConfigs[role];
+
+  // Dynamic Nav Items tailored to active role
   const primaryNavItems = [
     { id: 'home', label: 'Home', icon: ShieldAlert },
     { id: 'map', label: 'Live Map', icon: Map },
-    { 
-      id: role === 'citizen' ? 'citizen' : role === 'rescue' ? 'rescue' : role === 'volunteer' ? 'volunteer' : role === 'ngo' ? 'ngo' : 'admin', 
-      label: 'Dashboard', 
-      icon: UserCheck 
-    },
+    { id: currentRoleCfg.dashTab, label: currentRoleCfg.dashLabel, icon: UserCheck },
     { id: 'camps', label: 'Relief Camps', icon: Tent }
   ];
 
-  // Secondary Navigation Dropdown Items
   const secondaryNavItems = [
     { id: 'donations', label: 'Donate Relief', icon: Heart },
     { id: 'public', label: 'State Analytics', icon: BarChart3 },
@@ -72,10 +122,11 @@ export const Header: React.FC = () => {
   ];
 
   const isSecondaryActive = secondaryNavItems.some(item => item.id === activeTab);
+  const CtaIcon = currentRoleCfg.ctaIcon;
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-xs transition-all">
-      {/* Top Telemetry Alert Ticker Bar with Live Sync Badge */}
+      {/* Top Telemetry Alert Ticker Bar */}
       <div className="bg-rose-50 text-rose-900 text-xs h-8 px-4 flex items-center justify-between overflow-hidden border-b border-rose-200/80">
         <div className="flex items-center gap-2 font-bold text-rose-700 shrink-0 mr-4 z-10 bg-rose-50 pr-2">
           <span className="relative flex h-2 w-2">
@@ -95,7 +146,6 @@ export const Header: React.FC = () => {
           <span>Axom Relief Helpline: +91 361 2237011 | ASDMA State Control: 1070 / 1077 | 108 Ambulance</span>
         </div>
 
-        {/* Live Sync Badge moved into top bar to eliminate header clutter */}
         <div className="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-100/90 text-emerald-800 text-[10px] font-extrabold shrink-0 border border-emerald-200 ml-3 z-10">
           <Wifi className="w-3 h-3 text-emerald-600 animate-pulse" />
           <span>Synced {telemetry.lastSyncedAt}</span>
@@ -126,7 +176,7 @@ export const Header: React.FC = () => {
             </div>
           </div>
 
-          {/* Clean 4-Tab Navigation Bar */}
+          {/* Navigation Bar tailored to active role */}
           <nav className="hidden lg:flex items-center gap-1">
             {primaryNavItems.map(item => {
               const Icon = item.icon;
@@ -214,19 +264,19 @@ export const Header: React.FC = () => {
             {/* Role Switcher Pill */}
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className={`hidden sm:flex px-3 py-1.5 rounded-xl text-xs font-bold border items-center gap-1.5 transition-all ${roleLabels[role].badgeColor}`}
+              className={`hidden sm:flex px-3 py-1.5 rounded-xl text-xs font-bold border items-center gap-1.5 transition-all ${currentRoleCfg.badgeColor}`}
             >
               <LogIn className="w-3.5 h-3.5" />
-              <span>{roleLabels[role].title}</span>
+              <span>{currentRoleCfg.title}</span>
             </button>
 
-            {/* Emergency SOS Trigger Button */}
+            {/* Dynamic Role Action Button */}
             <button
-              onClick={() => setIsSosModalOpen(true)}
+              onClick={currentRoleCfg.ctaAction}
               className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-extrabold px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-pink-500/20 border border-rose-300 animate-sos-pulse transition-all"
             >
-              <PhoneCall className="w-3.5 h-3.5" />
-              <span>SOS EMERGENCY</span>
+              <CtaIcon className="w-3.5 h-3.5" />
+              <span>{currentRoleCfg.ctaLabel}</span>
             </button>
 
             {/* Mobile Hamburger Menu button */}
@@ -247,9 +297,9 @@ export const Header: React.FC = () => {
             <span className="text-xs text-slate-500 font-medium">Active Role:</span>
             <button
               onClick={() => { setIsAuthModalOpen(true); setMobileMenuOpen(false); }}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${roleLabels[role].badgeColor}`}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${currentRoleCfg.badgeColor}`}
             >
-              {roleLabels[role].title} (Switch)
+              {currentRoleCfg.title} (Switch)
             </button>
           </div>
           <div className="grid grid-cols-2 gap-2 pt-1">
