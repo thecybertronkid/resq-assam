@@ -20,7 +20,8 @@ import {
   Radio,
   Package,
   Building,
-  ArrowRight
+  ArrowRight,
+  X
 } from 'lucide-react';
 
 export const LiveIncidentMap: React.FC = () => {
@@ -155,7 +156,7 @@ export const LiveIncidentMap: React.FC = () => {
     if (selectedFilter === 'all' || selectedFilter === 'camps') {
       camps.forEach(camp => {
         if (selectedDistrict !== 'all' && camp.district !== selectedDistrict) return;
-        if (searchQuery && !camp.name.toLowerCase().includes(searchQuery.toLowerCase())) return;
+        if (searchQuery && !camp.name.toLowerCase().includes(searchQuery.toLowerCase()) && !camp.district.toLowerCase().includes(searchQuery.toLowerCase())) return;
 
         const icon = createCustomIcon('#10b981', '⛺');
         const marker = L.marker([camp.lat, camp.lng], { icon }).addTo(map);
@@ -175,36 +176,36 @@ export const LiveIncidentMap: React.FC = () => {
   }, [incidents, camps, roadReports, selectedFilter, selectedDistrict, searchQuery]);
 
   return (
-    <div className="relative w-full h-[calc(100vh-6rem)] min-h-[550px] flex flex-col md:flex-row overflow-hidden bg-slate-50">
-      {/* Top Floating Control Bar */}
-      <div className="absolute top-4 left-4 right-4 z-[500] flex flex-wrap items-center justify-between gap-3 pointer-events-none">
-        <div className="flex flex-wrap items-center gap-2 pointer-events-auto bg-white/95 backdrop-blur-md p-2 rounded-2xl border border-slate-200 shadow-lg">
+    <div className="relative w-full h-[calc(100vh-5.5rem)] min-h-[500px] flex flex-col md:flex-row overflow-hidden bg-slate-50">
+      {/* Top Floating Control Bar - Responsive Mobile Container */}
+      <div className="absolute top-3 left-3 right-3 z-[500] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pointer-events-none">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pointer-events-auto bg-white/95 backdrop-blur-md p-2 rounded-2xl border border-slate-200 shadow-lg">
           {/* Search Bar */}
           <div className="relative flex items-center">
             <Search className="w-4 h-4 absolute left-3 text-slate-400" />
             <input
               type="text"
-              placeholder="Search village, camp, landmark..."
+              placeholder="Search village, camp..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-pink-500 w-48 sm:w-64 font-medium"
+              className="w-full sm:w-56 bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-pink-500 font-medium"
             />
           </div>
 
-          {/* Filter category chips */}
-          <div className="flex items-center gap-1 overflow-x-auto py-0.5">
+          {/* Filter Chips */}
+          <div className="flex items-center gap-1 overflow-x-auto py-0.5 scrollbar-none">
             {[
               { id: 'all', label: 'All Items' },
-              { id: 'sos', label: '🆘 SOS Emergencies' },
-              { id: 'camps', label: '⛺ Relief Camps' },
-              { id: 'roads', label: '🚧 Blocked Roads' }
+              { id: 'sos', label: '🆘 SOS' },
+              { id: 'camps', label: '⛺ Camps' },
+              { id: 'roads', label: '🚧 Roads' }
             ].map(f => (
               <button
                 key={f.id}
                 onClick={() => setSelectedFilter(f.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors ${
+                className={`px-2.5 py-1 rounded-xl text-xs font-bold whitespace-nowrap transition-colors ${
                   selectedFilter === f.id
-                    ? 'bg-pink-500 text-white shadow-sm'
+                    ? 'bg-pink-500 text-white shadow-xs'
                     : 'bg-slate-100 text-slate-700 hover:bg-pink-50 hover:text-pink-600'
                 }`}
               >
@@ -214,51 +215,51 @@ export const LiveIncidentMap: React.FC = () => {
           </div>
         </div>
 
-        {/* Role-Specific Map Action Button */}
-        <div className="pointer-events-auto flex items-center gap-2">
+        {/* Role Action CTA Button */}
+        <div className="pointer-events-auto flex items-center gap-2 self-end sm:self-auto">
           {role === 'rescue' && (
             <button
               onClick={() => setActiveTab('rescue')}
-              className="bg-rose-600 hover:bg-rose-500 text-white font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg border border-rose-300"
+              className="bg-rose-600 hover:bg-rose-500 text-white font-extrabold px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow-lg border border-rose-300"
             >
               <ShieldAlert className="w-4 h-4" />
-              <span>Tactical Triage Queue</span>
+              <span>Triage Queue</span>
             </button>
           )}
           {role === 'volunteer' && (
             <button
               onClick={() => setActiveTab('volunteer')}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg border border-emerald-300"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow-lg border border-emerald-300"
             >
               <Radio className="w-4 h-4" />
-              <span>Volunteer Field Tasks</span>
+              <span>Tasks</span>
             </button>
           )}
           {role === 'ngo' && (
             <button
               onClick={() => setActiveTab('ngo')}
-              className="bg-purple-600 hover:bg-purple-500 text-white font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg border border-purple-300"
+              className="bg-purple-600 hover:bg-purple-500 text-white font-extrabold px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow-lg border border-purple-300"
             >
               <Package className="w-4 h-4" />
-              <span>Relief Warehouse Stock</span>
+              <span>Warehouse</span>
             </button>
           )}
           {role === 'admin' && (
             <button
               onClick={() => setActiveTab('admin')}
-              className="bg-amber-600 hover:bg-amber-500 text-white font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg border border-amber-300"
+              className="bg-amber-600 hover:bg-amber-500 text-white font-extrabold px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow-lg border border-amber-300"
             >
               <Building className="w-4 h-4" />
-              <span>ASDMA War Room</span>
+              <span>War Room</span>
             </button>
           )}
           {role === 'citizen' && (
             <button
               onClick={() => setIsSosModalOpen(true)}
-              className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg border border-rose-300 animate-sos-pulse"
+              className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-extrabold px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow-lg border border-rose-300 animate-sos-pulse"
             >
               <ShieldAlert className="w-4 h-4" />
-              <span>Pin Emergency SOS</span>
+              <span>Pin SOS</span>
             </button>
           )}
         </div>
@@ -266,18 +267,18 @@ export const LiveIncidentMap: React.FC = () => {
 
       {/* Ctrl + Scroll Zoom Overlay Hint */}
       {showCtrlHint && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[700] bg-slate-900/90 backdrop-blur-md text-white font-bold text-xs px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 animate-fade-in border border-slate-700 pointer-events-none">
-          <Info className="w-4 h-4 text-sky-400" />
-          <span>Use <kbd className="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-600">Ctrl</kbd> + scroll to zoom the map</span>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[700] bg-slate-900/90 backdrop-blur-md text-white font-bold text-xs px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 animate-fade-in border border-slate-700 pointer-events-none text-center max-w-xs">
+          <Info className="w-4 h-4 text-sky-400 shrink-0" />
+          <span>Use <kbd className="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-600">Ctrl</kbd> + scroll to zoom map</span>
         </div>
       )}
 
       {/* Map Element Container */}
-      <div ref={mapContainerRef} className="w-full h-full z-10 min-h-[550px]" />
+      <div ref={mapContainerRef} className="w-full h-full z-10 min-h-[500px]" />
 
-      {/* Slide-over Inspector Drawer */}
+      {/* Responsive Slide-up Sheet / Slide-over Drawer */}
       {selectedItem && (
-        <div className="absolute right-4 top-20 bottom-4 w-full max-w-sm z-[600] bg-white/95 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-2xl p-5 flex flex-col justify-between overflow-y-auto animate-fade-in text-slate-900">
+        <div className="fixed md:absolute inset-x-0 bottom-0 md:bottom-4 md:right-4 md:left-auto md:top-20 z-[600] w-full md:max-w-sm bg-white/95 backdrop-blur-xl border border-slate-200 rounded-t-3xl md:rounded-2xl shadow-2xl p-5 flex flex-col justify-between overflow-y-auto animate-fade-in text-slate-900 max-h-[80vh] md:max-h-none">
           <div>
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
               <span className="text-xs uppercase font-extrabold tracking-wider text-pink-600 flex items-center gap-1.5">
@@ -288,9 +289,9 @@ export const LiveIncidentMap: React.FC = () => {
               </span>
               <button
                 onClick={() => setSelectedItem(null)}
-                className="text-slate-500 hover:text-slate-900 text-xs bg-slate-100 px-2.5 py-1 rounded-lg font-bold"
+                className="text-slate-500 hover:text-slate-900 text-xs bg-slate-100 p-1.5 rounded-full font-bold"
               >
-                Close ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -307,8 +308,8 @@ export const LiveIncidentMap: React.FC = () => {
                       </h3>
                       <p className="text-xs text-slate-500 font-medium">{inc.village} ({inc.landmark})</p>
                     </div>
-                    <span className="text-xs text-pink-700 font-bold bg-pink-50 px-2 py-1 rounded border border-pink-200">
-                      AI Priority: {inc.aiVulnerabilityScore}/100
+                    <span className="text-xs text-pink-700 font-bold bg-pink-50 px-2 py-1 rounded border border-pink-200 shrink-0">
+                      AI: {inc.aiVulnerabilityScore}/100
                     </span>
                   </div>
 
@@ -324,17 +325,6 @@ export const LiveIncidentMap: React.FC = () => {
                     </div>
                   </div>
 
-                  {inc.photos.length > 0 && (
-                    <div>
-                      <p className="text-xs font-bold text-slate-700 mb-1.5">Attached Evidence:</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {inc.photos.map((url, i) => (
-                          <img key={i} src={url} alt="SOS attachment" className="w-full h-24 object-cover rounded-lg border border-slate-200" />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
                   {/* Role Tailored Action Box */}
                   <div className="p-3 rounded-xl border bg-pink-50/60 border-pink-200 space-y-2">
                     <span className="text-[10px] uppercase font-bold text-pink-700 block">
@@ -343,7 +333,7 @@ export const LiveIncidentMap: React.FC = () => {
                     {role === 'rescue' && (
                       <button
                         onClick={() => { setActiveTab('rescue'); showToast(`🚁 Assigned Boat Unit to Incident ${inc.id}!`); }}
-                        className="w-full bg-rose-600 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1.5"
+                        className="w-full bg-rose-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5"
                       >
                         Assign NDRF Boat Unit →
                       </button>
@@ -351,7 +341,7 @@ export const LiveIncidentMap: React.FC = () => {
                     {role === 'volunteer' && (
                       <button
                         onClick={() => showToast(`🦺 Volunteer accepted task for Incident ${inc.id}!`)}
-                        className="w-full bg-emerald-600 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1.5"
+                        className="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5"
                       >
                         Accept Field Volunteer Task →
                       </button>
@@ -359,7 +349,7 @@ export const LiveIncidentMap: React.FC = () => {
                     {role === 'ngo' && (
                       <button
                         onClick={() => { setActiveTab('ngo'); showToast(`📦 Allocated 100 ration kits for Incident ${inc.id}!`); }}
-                        className="w-full bg-purple-600 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1.5"
+                        className="w-full bg-purple-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5"
                       >
                         Allocate Relief Ration →
                       </button>
@@ -367,7 +357,7 @@ export const LiveIncidentMap: React.FC = () => {
                     {role === 'admin' && (
                       <button
                         onClick={() => { setActiveTab('admin'); showToast(`🏛️ Moderate AI Duplicate Flag for ${inc.id}!`); }}
-                        className="w-full bg-amber-600 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1.5"
+                        className="w-full bg-amber-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5"
                       >
                         Moderate AI Duplicate Flag →
                       </button>
@@ -375,7 +365,7 @@ export const LiveIncidentMap: React.FC = () => {
                     {role === 'citizen' && (
                       <button
                         onClick={() => showToast(`🆘 Requesting priority evacuation for ${inc.id}...`)}
-                        className="w-full bg-sky-600 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1.5"
+                        className="w-full bg-sky-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5"
                       >
                         Request Priority Evacuation →
                       </button>
@@ -407,25 +397,17 @@ export const LiveIncidentMap: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-xs font-bold">
-                    <div className="bg-emerald-50 p-2 rounded-xl border border-emerald-200 text-emerald-800">
-                      ✓ Food & Water
-                    </div>
-                    <div className="bg-emerald-50 p-2 rounded-xl border border-emerald-200 text-emerald-800">
-                      ✓ Medical Bay
-                    </div>
-                    <div className="bg-pink-50 p-2 rounded-xl border border-pink-200 text-pink-800">
-                      ✓ Women & Child Safe
-                    </div>
-                    <div className="bg-purple-50 p-2 rounded-xl border border-purple-200 text-purple-800">
-                      {camp.petFriendly ? '✓ Pet Shelter' : '✕ No Pets'}
-                    </div>
+                    <div className="bg-emerald-50 p-2 rounded-xl border border-emerald-200 text-emerald-800">✓ Food & Water</div>
+                    <div className="bg-emerald-50 p-2 rounded-xl border border-emerald-200 text-emerald-800">✓ Medical Bay</div>
+                    <div className="bg-pink-50 p-2 rounded-xl border border-pink-200 text-pink-800">✓ Women/Child Safe</div>
+                    <div className="bg-purple-50 p-2 rounded-xl border border-purple-200 text-purple-800">{camp.petFriendly ? '✓ Pet Shelter' : '✕ No Pets'}</div>
                   </div>
                 </div>
               );
             })()}
           </div>
 
-          <div className="pt-4 border-t border-slate-100 space-y-2">
+          <div className="pt-3 mt-3 border-t border-slate-100 space-y-2">
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${selectedItem.data.lat},${selectedItem.data.lng}`}
               target="_blank"
