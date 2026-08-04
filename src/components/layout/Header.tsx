@@ -17,9 +17,12 @@ import {
   X,
   PhoneCall,
   BarChart3,
-  ChevronDown
+  ChevronDown,
+  Radio,
+  Wifi
 } from 'lucide-react';
 import { UserRole } from '../../types';
+import { AXOM_RELIEF_EMERGENCY_DATA } from '../../utils/asdmaSyncEngine';
 
 export const Header: React.FC = () => {
   const { 
@@ -33,13 +36,12 @@ export const Header: React.FC = () => {
     setIsAuthModalOpen,
     setIsAiDrawerOpen,
     alerts,
-    isOnline
+    isOnline,
+    telemetry
   } = useApp();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
-
-  const latestAlert = alerts[0];
 
   const roleLabels: Record<UserRole, { title: string; badgeColor: string }> = {
     citizen: { title: 'Citizen Mode', badgeColor: 'bg-sky-50 text-sky-700 border-sky-200' },
@@ -49,7 +51,7 @@ export const Header: React.FC = () => {
     admin: { title: 'Govt Admin', badgeColor: 'bg-amber-50 text-amber-800 border-amber-200' }
   };
 
-  // Primary Navigation (Clean 6 items)
+  // Primary Navigation
   const primaryNavItems = [
     { id: 'home', label: 'Home', icon: ShieldAlert },
     { id: 'map', label: 'Live Map', icon: Map },
@@ -63,7 +65,7 @@ export const Header: React.FC = () => {
     { id: 'public', label: 'Analytics', icon: BarChart3 }
   ];
 
-  // Secondary Navigation (Under "More Modules" dropdown)
+  // Secondary Navigation
   const secondaryNavItems = [
     { id: 'missing', label: 'Missing Persons', icon: UserSearch },
     { id: 'roads', label: 'Road Status', icon: Navigation },
@@ -75,19 +77,23 @@ export const Header: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-xs transition-all">
-      {/* Clean Ticker Bar */}
+      {/* Live Telemetry Alert Ticker Bar synced with ASDMA & Axom Relief */}
       <div className="bg-rose-50 text-rose-900 text-xs h-8 px-4 flex items-center overflow-hidden border-b border-rose-200/80">
         <div className="flex items-center gap-2 font-bold text-rose-700 shrink-0 mr-4 z-10 bg-rose-50 pr-2">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
           </span>
-          <span className="tracking-wide uppercase text-[11px]">ASDMA BULLETIN:</span>
+          <span className="tracking-wide uppercase text-[11px]">ASDMA & AXOM RELIEF SYNC:</span>
         </div>
         <div className="animate-ticker-smooth text-rose-900 flex gap-8 font-medium text-[11px] whitespace-nowrap">
-          <span>{latestAlert ? `${latestAlert.title} — ${latestAlert.riverLevel || latestAlert.description}` : 'Brahmaputra flowing 0.5m above danger level in Guwahati.'}</span>
-          <span>NDRF 1st Bn Patgaon & SDRF deployed across 14 affected districts. Control Helpline: 1070 / 1077.</span>
-          <span>{!isOnline && '⚠️ OFFLINE MODE: Reports saved locally & auto-dispatched upon network restore.'}</span>
+          {telemetry.activeRiverGauges.map(g => (
+            <span key={g.station} className="font-bold">
+              🌊 {g.station}: {g.waterLevelMeter}m (Danger: {g.dangerLevelMeter}m) — <span className="text-rose-600 uppercase font-extrabold">{g.trend}</span>
+            </span>
+          ))}
+          <span>Axom Relief Helpline: +91 361 2237011 | ASDMA State Control: 1070 / 1077 | 108 Ambulance</span>
+          <span>Last Synced: {telemetry.lastSyncedAt}</span>
         </div>
       </div>
 
@@ -95,25 +101,33 @@ export const Header: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           
-          {/* Brand Logo */}
-          <div 
-            onClick={() => setActiveTab('home')}
-            className="flex items-center gap-2.5 cursor-pointer group shrink-0"
-          >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 via-pink-500 to-sky-400 p-0.5 shadow-sm group-hover:scale-105 transition-transform duration-200">
-              <div className="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
-                <ShieldAlert className="w-5 h-5 text-rose-500" />
+          {/* Brand Logo & ASDMA Sync Pill */}
+          <div className="flex items-center gap-3">
+            <div 
+              onClick={() => setActiveTab('home')}
+              className="flex items-center gap-2.5 cursor-pointer group shrink-0"
+            >
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 via-pink-500 to-sky-400 p-0.5 shadow-sm group-hover:scale-105 transition-transform duration-200">
+                <div className="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
+                  <ShieldAlert className="w-5 h-5 text-rose-500" />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-heading font-extrabold text-lg tracking-tight text-slate-900">
+                    ResQ <span className="text-rose-500">Assam</span>
+                  </span>
+                  <span className="bg-rose-50 text-rose-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-rose-200">
+                    ASDMA
+                  </span>
+                </div>
               </div>
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-heading font-extrabold text-lg tracking-tight text-slate-900">
-                  ResQ <span className="text-rose-500">Assam</span>
-                </span>
-                <span className="bg-rose-50 text-rose-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-rose-200">
-                  ASDMA
-                </span>
-              </div>
+
+            {/* Live ASDMA & Axom Relief Network Status Pill */}
+            <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
+              <Wifi className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
+              <span>AxomRelief Live Sync ({telemetry.lastSyncedAt})</span>
             </div>
           </div>
 

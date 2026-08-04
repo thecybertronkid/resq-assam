@@ -22,6 +22,7 @@ import {
 } from '../utils/mockData';
 import { getOfflineSosQueue, clearOfflineSosQueue, saveSosToOfflineQueue } from '../utils/offlineSync';
 import { detectDuplicateIncident, calculateAiVulnerabilityScore } from '../utils/aiEngine';
+import { AsdmaSyncEngine, LiveTelemetryStatus, AXOM_RELIEF_EMERGENCY_DATA } from '../utils/asdmaSyncEngine';
 
 interface AppContextType {
   role: UserRole;
@@ -47,6 +48,9 @@ interface AppContextType {
   isOnline: boolean;
   toastMessage: string | null;
   showToast: (msg: string) => void;
+
+  // Live Telemetry Sync
+  telemetry: LiveTelemetryStatus;
   
   // Handlers
   submitSosReport: (report: Partial<IncidentReport>) => void;
@@ -72,7 +76,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Entities
+  // Core Data States
   const [incidents, setIncidents] = useState<IncidentReport[]>(INITIAL_INCIDENTS);
   const [camps, setCamps] = useState<ReliefCamp[]>(INITIAL_RELIEF_CAMPS);
   const [volunteers, setVolunteers] = useState<Volunteer[]>(INITIAL_VOLUNTEERS);
@@ -82,203 +86,179 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [alerts, setAlerts] = useState<DisasterAlert[]>(INITIAL_ALERTS);
   const [donations, setDonations] = useState<Donation[]>(INITIAL_DONATIONS);
 
-  // Network listener & auto offline sync
+  // Live Telemetry Sync State
+  const [telemetry, setTelemetry] = useState<LiveTelemetryStatus>(AsdmaSyncEngine.getInstance().getTelemetry());
+
   useEffect(() => {
+    const unsubscribe = AsdmaSyncEngine.getInstance().subscribe((newTelemetry) => {
+      setTelemetry(newTelemetry);
+    });
+
     const handleOnline = () => {
       setIsOnline(true);
-      showToast('🌐 Internet reconnected! Syncing offline SOS reports...');
-      syncOfflineReports();
+      showToast('🟢 Back Online! Synchronizing offline emergency reports with ASDMA & Axom Relief servers...');
+      const queue = getOfflineSosQueue();
+      if (queue.length > 0) {
+        queue.forEach(qReport => {
+          submitSosReport(qReport);
+        });
+        clearOfflineSosQueue();
+      }
     };
+
     const handleOffline = () => {
       setIsOnline(false);
-      showToast('⚠️ Network connection lost. Offline emergency mode active.');
+      showToast('⚠️ Network Disconnected! SOS reports will be queued locally via IndexedDB.');
     };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
     return () => {
+      unsubscribe();
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [incidents]);
+  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 5000);
-  };
-
-  const syncOfflineReports = () => {
-    const queue = getOfflineSosQueue();
-    if (queue.length > 0) {
-      queue.forEach(q => {
-        const fullReport: IncidentReport = {
-          id: q.id || `SOS-${Math.floor(1000 + Math.random() * 9000)}`,
-          reporterName: q.reporterName || 'Anonymous Citizen',
-          reporterPhone: q.reporterPhone || '+91 98000 00000',
-          lat: q.lat || 26.1445,
-          lng: q.lng || 91.7362,
-          district: q.district || 'Kamrup Metropolitan',
-          village: q.village || 'Unknown Village',
-          landmark: q.landmark || 'None',
-          disasterType: q.disasterType || 'flood',
-          severity: q.severity || 'high',
-          demographics: q.demographics || { adults: 1, children: 0, elderly: 0, disabled: 0, pregnant: 0, animals: 0 },
-          needs: q.needs || { food: true, water: true, medicine: false, boat: false, evacuation: false, livestock: false },
-          description: q.description || 'Offline SOS auto-synced',
-          photos: q.photos || [],
-          timestamp: 'Just now (Synced)',
-          status: 'pending',
-          aiVulnerabilityScore: calculateAiVulnerabilityScore(
-            q.disasterType || 'flood',
-            q.demographics || { adults: 1, children: 0, elderly: 0, disabled: 0, pregnant: 0, animals: 0 },
-            q.needs || { food: true, water: true, medicine: false, boat: false, evacuation: false, livestock: false }
-          )
-        };
-        setIncidents(prev => [fullReport, ...prev]);
-      });
-      clearOfflineSosQueue();
-      showToast(`✅ Successfully synced ${queue.length} offline report(s) to live database!`);
-    }
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 4500);
   };
 
   const submitSosReport = (report: Partial<IncidentReport>) => {
-    if (!isOnline) {
-      saveSosToOfflineQueue(report);
-      showToast('📡 Saved SOS Report locally. Will automatically dispatch when internet restores!');
-      return;
-    }
+    const id = `INC-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    const dupCheck = detectDuplicateIncident(report, incidents);
+    const dType = report.disasterType || 'flood';
+    const dDemo = report.demographics || { adults: 1, children: 0, elderly: 0, disabled: 0, pregnant: 0, animals: 0 };
+    const dNeeds = report.needs || { food: true, water: true, medicine: false, boat: true, evacuation: true, livestock: false };
 
-    const aiCheck = detectDuplicateIncident(report, incidents);
-    const vulScore = calculateAiVulnerabilityScore(
-      report.disasterType || 'flood',
-      report.demographics || { adults: 1, children: 0, elderly: 0, disabled: 0, pregnant: 0, animals: 0 },
-      report.needs || { food: true, water: true, medicine: false, boat: false, evacuation: false, livestock: false }
-    );
-
-    const newSos: IncidentReport = {
-      id: `SOS-${Math.floor(8930 + Math.random() * 1000)}`,
-      reporterName: report.reporterName || 'Citizen',
-      reporterPhone: report.reporterPhone || '+91 98640 00000',
+    const fullReport: IncidentReport = {
+      id,
+      reporterName: report.reporterName || 'Anonymous Citizen',
+      reporterPhone: report.reporterPhone || '+91 9800000000',
       lat: report.lat || 26.1445,
       lng: report.lng || 91.7362,
       district: report.district || 'Kamrup Metropolitan',
-      village: report.village || 'Guwahati Ward',
+      village: report.village || 'Guwahati Sector',
       landmark: report.landmark || '',
-      disasterType: report.disasterType || 'flood',
-      severity: report.severity || 'high',
-      demographics: report.demographics || { adults: 1, children: 0, elderly: 0, disabled: 0, pregnant: 0, animals: 0 },
-      needs: report.needs || { food: true, water: true, medicine: true, boat: false, evacuation: true, livestock: false },
-      description: report.description || 'Emergency assistance requested.',
+      disasterType: dType,
+      severity: report.severity || 'critical',
+      demographics: dDemo,
+      needs: dNeeds,
+      description: report.description || 'Emergency assistance needed.',
+      timestamp: new Date().toLocaleTimeString(),
+      status: 'pending',
       photos: report.photos || [],
       voiceNoteUrl: report.voiceNoteUrl,
-      timestamp: 'Just now',
-      status: 'pending',
-      aiDuplicateFlag: aiCheck.isDuplicate,
-      aiVulnerabilityScore: vulScore
+      aiVulnerabilityScore: calculateAiVulnerabilityScore(dType, dDemo, dNeeds),
+      aiDuplicateFlag: dupCheck.isDuplicate
     };
 
-    setIncidents(prev => [newSos, ...prev]);
-    showToast(
-      aiCheck.isDuplicate
-        ? `⚠️ SOS Submitted! Note: AI flagged potential duplicate of ${aiCheck.matchedIncidentId} (${aiCheck.confidenceScore}% confidence).`
-        : `🚨 Emergency SOS dispatched! Dispatched to NDRF/SDRF control room. AI Priority Score: ${vulScore}/100.`
-    );
+    if (!isOnline) {
+      saveSosToOfflineQueue(fullReport);
+      showToast(`💾 Offline Mode: Report ${id} stored in local IndexedDB. Will sync when back online.`);
+    } else {
+      setIncidents(prev => [fullReport, ...prev]);
+      showToast(`🆘 SOS Report ${id} submitted! Transmitted to ASDMA & NDRF Patgaon Control Room.`);
+    }
   };
 
   const updateIncidentStatus = (
-    id: string,
-    status: IncidentReport['status'],
-    teamId?: string,
-    teamName?: string,
-    notes?: string,
+    id: string, 
+    status: IncidentReport['status'], 
+    teamId?: string, 
+    teamName?: string, 
+    notes?: string, 
     photo?: string
   ) => {
-    setIncidents(prev =>
-      prev.map(item => {
-        if (item.id === id) {
-          return {
-            ...item,
-            status,
-            assignedTeamId: teamId || item.assignedTeamId,
-            assignedTeamName: teamName || item.assignedTeamName,
-            rescueNotes: notes || item.rescueNotes,
-            rescuePhoto: photo || item.rescuePhoto
-          };
-        }
-        return item;
-      })
-    );
-    showToast(`Status updated for ${id} → ${status.toUpperCase()}`);
+    setIncidents(prev => prev.map(inc => {
+      if (inc.id === id) {
+        return {
+          ...inc,
+          status,
+          assignedTeamId: teamId || inc.assignedTeamId,
+          assignedTeamName: teamName || inc.assignedTeamName,
+          rescueNotes: notes || inc.rescueNotes,
+          rescuePhoto: photo || inc.rescuePhoto
+        };
+      }
+      return inc;
+    }));
+    showToast(`🚁 Mission ${id} updated to status: ${status.toUpperCase()} (${teamName || 'NDRF Unit'})`);
   };
 
   const registerVolunteer = (vol: Partial<Volunteer>) => {
     const newVol: Volunteer = {
-      id: `VOL-${Math.floor(200 + Math.random() * 800)}`,
+      id: `VOL-${Math.floor(100 + Math.random() * 900)}`,
       name: vol.name || 'Volunteer',
-      phone: vol.phone || '',
+      phone: vol.phone || '+91 9800000000',
       email: vol.email || '',
       district: vol.district || 'Kamrup Metropolitan',
-      skills: vol.skills || ['logistics'],
-      available: true,
+      skills: vol.skills || ['swimmer'],
+      available: vol.available ?? true,
       isVerified: true,
+      lat: 26.15,
+      lng: 91.74,
       tasksAssigned: 0
     };
     setVolunteers(prev => [newVol, ...prev]);
-    showToast(`🎉 Volunteer ${newVol.name} registered and verified!`);
+    showToast(`🦺 Registered ${newVol.name} into State Volunteer Corps! ASDMA Badge Verified.`);
   };
 
   const reportMissingPerson = (person: Partial<MissingPerson>) => {
     const newPerson: MissingPerson = {
-      id: `MIS-${Math.floor(500 + Math.random() * 500)}`,
+      id: `MP-${Math.floor(100 + Math.random() * 900)}`,
       fullName: person.fullName || 'Unknown',
-      age: person.age || 25,
+      age: person.age || 30,
       gender: person.gender || 'Male',
-      lastSeenLocation: person.lastSeenLocation || 'Unknown',
+      lastSeenLocation: person.lastSeenLocation || 'Embankment',
       district: person.district || 'Kamrup Metropolitan',
       dateMissing: person.dateMissing || new Date().toISOString().split('T')[0],
-      photoUrl: person.photoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      reporterName: person.reporterName || 'Family Member',
+      reporterPhone: person.reporterPhone || '+91 9800000000',
+      photoUrl: person.photoUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
       status: 'missing',
-      reporterName: person.reporterName || 'Citizen',
-      reporterPhone: person.reporterPhone || '',
       details: person.details || ''
     };
     setMissingPersons(prev => [newPerson, ...prev]);
-    showToast(`🚨 Missing person bulletin published for ${newPerson.fullName}`);
+    showToast(`🔍 Published missing person bulletin for ${newPerson.fullName}. Broadcast to rescue units.`);
   };
 
   const reportRoadObstacle = (road: Partial<RoadReport>) => {
     const newRoad: RoadReport = {
-      id: `RD-${Math.floor(300 + Math.random() * 700)}`,
-      roadName: road.roadName || 'State Highway',
+      id: `RD-${Math.floor(100 + Math.random() * 900)}`,
+      roadName: road.roadName || 'Highway Stretch',
       district: road.district || 'Kamrup Metropolitan',
-      lat: road.lat || 26.1500,
-      lng: road.lng || 91.7500,
       status: road.status || 'waterlogged',
-      details: road.details || 'Obstacle reported',
-      reportedAt: 'Just now',
-      reportedBy: road.reportedBy || 'Citizen'
+      lat: road.lat || 26.15,
+      lng: road.lng || 91.75,
+      details: road.details || 'Submerged under flood water',
+      reportedBy: 'Citizen Telemetry',
+      reportedAt: new Date().toLocaleTimeString()
     };
     setRoadReports(prev => [newRoad, ...prev]);
-    showToast(`🚦 Road status alert logged for ${newRoad.roadName}`);
+    showToast(`🚧 Logged road hazard on ${newRoad.roadName}. Highlighted on Live Assam Map.`);
   };
 
-  const makeDonation = (don: Partial<Donation>) => {
-    const newDon: Donation = {
-      id: `DON-${Math.floor(6000 + Math.random() * 3000)}`,
-      donorName: don.donorName || 'Generous Donor',
-      email: don.email || 'donor@resq.gov.in',
-      phone: don.phone || '+91 98000 00000',
-      amount: don.amount,
-      itemType: don.itemType,
-      itemQuantity: don.itemQuantity,
-      district: don.district || 'Statewide',
-      timestamp: 'Just now',
+  const makeDonation = (donation: Partial<Donation>) => {
+    const newDonation: Donation = {
+      id: `DON-${Math.floor(1000 + Math.random() * 9000)}`,
+      donorName: donation.donorName || 'Generous Donor',
+      email: donation.email || '',
+      phone: donation.phone || '+91 9800000000',
+      amount: donation.amount,
+      itemType: donation.itemType,
+      itemQuantity: donation.itemQuantity,
+      district: donation.district || 'Statewide',
+      timestamp: new Date().toLocaleString(),
       receiptNo: `RSQ-2026-${Math.floor(10000 + Math.random() * 89999)}`,
-      paymentMethod: don.paymentMethod || 'UPI Instant'
+      paymentMethod: donation.paymentMethod || 'UPI / NetBanking'
     };
-    setDonations(prev => [newDon, ...prev]);
-    showToast(`❤️ Thank you! Donation receipt generated: ${newDon.receiptNo}`);
+    setDonations(prev => [newDonation, ...prev]);
+    showToast(`❤️ Thank you! Donation of ${newDonation.amount ? '₹' + newDonation.amount.toLocaleString() : newDonation.itemQuantity} received. E-Receipt ${newDonation.receiptNo} ready.`);
   };
 
   const addCamp = (camp: Partial<ReliefCamp>) => {
@@ -286,86 +266,61 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: `CAMP-${Math.floor(10 + Math.random() * 90)}`,
       name: camp.name || 'New Relief Shelter',
       district: camp.district || 'Kamrup Metropolitan',
-      lat: camp.lat || 26.1700,
-      lng: camp.lng || 91.7600,
       capacity: camp.capacity || 500,
       currentOccupancy: camp.currentOccupancy || 0,
-      food: camp.food ?? true,
-      water: camp.water ?? true,
-      medical: camp.medical ?? true,
-      toilets: camp.toilets ?? true,
-      charging: camp.charging ?? true,
-      womenFriendly: camp.womenFriendly ?? true,
-      childFriendly: camp.childFriendly ?? true,
-      petFriendly: camp.petFriendly ?? true,
-      contactPhone: camp.contactPhone || '+91 361 2000000',
-      inCharge: camp.inCharge || 'District Authority'
+      lat: camp.lat || 26.18,
+      lng: camp.lng || 91.76,
+      food: true,
+      water: true,
+      medical: true,
+      toilets: true,
+      charging: true,
+      womenFriendly: true,
+      childFriendly: true,
+      contactPhone: camp.contactPhone || '+91 361 200000',
+      inCharge: camp.inCharge || 'District CO',
+      petFriendly: true
     };
     setCamps(prev => [newCamp, ...prev]);
-    showToast(`⛺ Relief Camp ${newCamp.name} registered!`);
+    showToast(`⛺ Registered new relief camp: ${newCamp.name}. Live occupancy monitoring active.`);
   };
 
   const updateNgoStock = (ngoId: string, itemKey: keyof NGOInventory['items'], count: number) => {
-    setNgos(prev =>
-      prev.map(item => {
-        if (item.id === ngoId) {
-          return {
-            ...item,
-            items: {
-              ...item.items,
-              [itemKey]: count
-            },
-            lastUpdated: 'Just now'
-          };
-        }
-        return item;
-      })
-    );
-    showToast(`📦 Relief inventory updated!`);
+    setNgos(prev => prev.map(ngo => {
+      if (ngo.id === ngoId) {
+        return {
+          ...ngo,
+          items: { ...ngo.items, [itemKey]: count },
+          lastUpdated: new Date().toLocaleTimeString()
+        };
+      }
+      return ngo;
+    }));
   };
 
-  // Translation helper
-  const t = (textKey: string): string => {
-    return textKey;
-  };
+  const t = (key: string) => key;
 
   return (
-    <AppContext.Provider
-      value={{
-        role,
-        setRole,
-        language,
-        setLanguage,
-        activeTab,
-        setActiveTab,
-        incidents,
-        camps,
-        volunteers,
-        ngos,
-        missingPersons,
-        roadReports,
-        alerts,
-        donations,
-        isSosModalOpen,
-        setIsSosModalOpen,
-        isAuthModalOpen,
-        setIsAuthModalOpen,
-        isAiDrawerOpen,
-        setIsAiDrawerOpen,
-        isOnline,
-        toastMessage,
-        showToast,
-        submitSosReport,
-        updateIncidentStatus,
-        registerVolunteer,
-        reportMissingPerson,
-        reportRoadObstacle,
-        makeDonation,
-        addCamp,
-        updateNgoStock,
-        t
-      }}
-    >
+    <AppContext.Provider value={{
+      role, setRole,
+      language, setLanguage,
+      activeTab, setActiveTab,
+      incidents, camps, volunteers, ngos, missingPersons, roadReports, alerts, donations,
+      isSosModalOpen, setIsSosModalOpen,
+      isAuthModalOpen, setIsAuthModalOpen,
+      isAiDrawerOpen, setIsAiDrawerOpen,
+      isOnline, toastMessage, showToast,
+      telemetry,
+      submitSosReport,
+      updateIncidentStatus,
+      registerVolunteer,
+      reportMissingPerson,
+      reportRoadObstacle,
+      makeDonation,
+      addCamp,
+      updateNgoStock,
+      t
+    }}>
       {children}
     </AppContext.Provider>
   );
