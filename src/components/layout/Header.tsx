@@ -15,7 +15,8 @@ import {
   LogIn, 
   Menu, 
   X,
-  PhoneCall
+  PhoneCall,
+  BarChart3
 } from 'lucide-react';
 import { UserRole } from '../../types';
 
@@ -59,7 +60,8 @@ export const Header: React.FC = () => {
     { id: 'roads', label: 'Road Status', icon: Navigation },
     { id: 'medical', label: 'Hospitals', icon: Hospital },
     { id: 'alerts', label: 'Disaster Alerts', icon: Bell },
-    { id: 'donations', label: 'Donate', icon: Heart }
+    { id: 'donations', label: 'Donate', icon: Heart },
+    { id: 'public', label: 'Analytics', icon: BarChart3 }
   ];
 
   return (

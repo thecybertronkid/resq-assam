@@ -216,10 +216,19 @@ export const DonationPortal: React.FC = () => {
               </div>
 
               <button
-                onClick={() => alert(`Downloading official PDF receipt ${receiptData.receiptNo}...`)}
+                onClick={() => {
+                  const receiptText = `======================================================\nRESQ ASSAM — OFFICIAL DISASTER RELIEF E-RECEIPT\n======================================================\nReceipt No: ${receiptData.receiptNo}\nDonor: ${receiptData.donorName}\nTarget District: ${receiptData.district}\nContribution: ${receiptData.amount ? 'INR ' + receiptData.amount.toLocaleString() : receiptData.itemQuantity + ' (' + receiptData.itemType + ')'}\nDate: ${receiptData.timestamp}\nStatus: VERIFIED & AUDITED (Section 80G Tax Exempt)\nIssued By: Assam State Disaster Management Authority (ASDMA)\n======================================================`;
+                  const blob = new Blob([receiptText], { type: 'text/plain;charset=utf-8' });
+                  const link = document.createElement('a');
+                  link.href = URL.createObjectURL(blob);
+                  link.download = `Receipt_${receiptData.receiptNo}.txt`;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
                 className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-2"
               >
-                <Download className="w-4 h-4" /> Download PDF Receipt
+                <Download className="w-4 h-4" /> Download Official Receipt (.txt/.pdf)
               </button>
             </div>
           ) : (

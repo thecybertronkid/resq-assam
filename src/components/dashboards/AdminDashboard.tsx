@@ -27,7 +27,28 @@ export const AdminDashboard: React.FC = () => {
   };
 
   const handleExportStatewideReport = () => {
-    showToast(`📄 Generated Statewide ASDMA Disaster Report CSV for 31 districts!`);
+    const headers = ['Incident ID', 'District', 'Village', 'Disaster Type', 'Severity', 'AI Score', 'Status', 'Children', 'Elderly', 'Pregnant'];
+    const rows = incidents.map(i => [
+      i.id,
+      `"${i.district}"`,
+      `"${i.village}"`,
+      i.disasterType,
+      i.severity,
+      i.aiVulnerabilityScore,
+      i.status,
+      i.demographics.children,
+      i.demographics.elderly,
+      i.demographics.pregnant
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `ASDMA_Statewide_Disaster_Report_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast(`📄 Downloaded ASDMA Statewide Disaster CSV Report (${incidents.length} incidents logged)!`);
   };
 
   return (
