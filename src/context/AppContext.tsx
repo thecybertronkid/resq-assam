@@ -23,6 +23,7 @@ import {
 import { detectDuplicateIncident, calculateAiVulnerabilityScore } from '../utils/aiEngine';
 import { saveSosToOfflineQueue, getOfflineSosQueue, clearOfflineSosQueue } from '../utils/offlineSync';
 import { AsdmaSyncEngine, LiveTelemetryStatus } from '../utils/asdmaSyncEngine';
+import { dbService } from '../utils/databaseService';
 
 interface AppContextType {
   role: UserRole;
@@ -88,7 +89,45 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Live Telemetry Sync State
   const [telemetry, setTelemetry] = useState<LiveTelemetryStatus>(AsdmaSyncEngine.getInstance().getTelemetry());
 
+  // DATABASE INITIALIZATION & HYDRATION FROM INDEXEDDB
   useEffect(() => {
+    const loadDatabaseState = async () => {
+      try {
+        const [
+          savedIncidents,
+          savedCamps,
+          savedVolunteers,
+          savedNgos,
+          savedMissing,
+          savedRoads,
+          savedAlerts,
+          savedDonations
+        ] = await Promise.all([
+          dbService.getIncidents(),
+          dbService.getCamps(),
+          dbService.getVolunteers(),
+          dbService.getNGOs(),
+          dbService.getMissingPersons(),
+          dbService.getRoadReports(),
+          dbService.getAlerts(),
+          dbService.getDonations()
+        ]);
+
+        if (savedIncidents.length > 0) setIncidents(savedIncidents);
+        if (savedCamps.length > 0) setCamps(savedCamps);
+        if (savedVolunteers.length > 0) setVolunteers(savedVolunteers);
+        if (savedNgos.length > 0) setNgos(savedNgos);
+        if (savedMissing.length > 0) setMissingPersons(savedMissing);
+        if (savedRoads.length > 0) setRoadReports(savedRoads);
+        if (savedAlerts.length > 0) setAlerts(savedAlerts);
+        if (savedDonations.length > 0) setDonations(savedDonations);
+      } catch (err) {
+        console.error('Failed to hydrate state from ResQAssamDB:', err);
+      }
+    };
+
+    loadDatabaseState();
+
     const unsubscribe = AsdmaSyncEngine.getInstance().subscribe((newTelemetry) => {
       setTelemetry(newTelemetry);
     });
@@ -136,7 +175,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const severity = report.severity || 'critical';
     const aiVulnerabilityScore = calculateAiVulnerabilityScore(dType, dDemo, dNeeds);
 
-    // FIX 3: Auto-assign critical dispatches to nearest verified & available volunteer
     let assignedTeamId: string | undefined = undefined;
     let assignedTeamName: string | undefined = undefined;
     let initialStatus: IncidentReport['status'] = 'submitted';
@@ -148,8 +186,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         assignedTeamName = `${activeVerifiedVol.name} (${activeVerifiedVol.skills.join(', ')})`;
         initialStatus = 'accepted';
 
-        // Increment volunteer assigned tasks count
-        setVolunteers(prev => prev.map(v => v.id === activeVerifiedVol.id ? { ...v, tasksAssigned: v.tasksAssigned + 1 } : v));
+        const updatedVol = { ...activeVerifiedVol, tasksAssigned: activeVerifiedVol.tasksAssigned + 1 };
+        setVolunteers(prev => prev.map(v => v.id === activeVerifiedVol.id ? updatedVol : v));
+        dbService.saveVolunteer(updatedVol);
+
         showToast(`🚨 CRITICAL DISPATCH: Auto-assigned to nearest ASDMA Verified Volunteer [${activeVerifiedVol.name}] in ${activeVerifiedVol.district}!`);
       }
     }
@@ -183,8 +223,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       showToast(`💾 Offline Mode: Report ${id} stored in local IndexedDB. Will sync when back online.`);
     } else {
       setIncidents(prev => [fullReport, ...prev]);
+      dbService.saveIncident(fullReport); // PERSIST TO DATABASE
       if (initialStatus === 'submitted') {
-        showToast(`🆘 SOS Report ${id} submitted! Transmitted to ASDMA & NDRF Patgaon Control Room.`);
+        showToast(`🆘 SOS Report ${id} submitted & saved to database! Transmitted to ASDMA & NDRF Patgaon Control Room.`);
       }
     }
   };
@@ -198,26 +239,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   ) => {
     setIncidents(prev => prev.map(inc => {
       if (inc.id === id) {
-        return {
+        const updated = {
           ...inc,
           status,
           assignedTeamId: teamId || inc.assignedTeamId,
           assignedTeamName: teamName || inc.assignedTeamName,
           rescuePhotoProof: rescuePhotoProof || inc.rescuePhotoProof
         };
+        dbService.saveIncident(updated); // PERSIST UPDATE TO DATABASE
+        return updated;
       }
       return inc;
     }));
-    showToast(`🚁 Incident ${id} status updated to [${status.toUpperCase()}]!`);
+    showToast(`🚁 Incident ${id} status updated to [${status.toUpperCase()}] & saved to database!`);
   };
 
   const addCamp = (camp: ReliefCamp) => {
     setCamps(prev => [camp, ...prev]);
-    showToast(`⛺ Registered new relief camp "${camp.name}" in ${camp.district}!`);
+    dbService.saveCamp(camp); // PERSIST TO DATABASE
+    showToast(`⛺ Registered new relief camp "${camp.name}" in ${camp.district}! Saved to database.`);
   };
 
   const updateCampOccupancy = (campId: string, occupancy: number) => {
-    setCamps(prev => prev.map(c => c.id === campId ? { ...c, currentOccupancy: occupancy } : c));
+    setCamps(prev => prev.map(c => {
+      if (c.id === campId) {
+        const updated = { ...c, currentOccupancy: occupancy };
+        dbService.saveCamp(updated); // PERSIST TO DATABASE
+        return updated;
+      }
+      return c;
+    }));
     showToast(`📊 Updated camp occupancy for ${campId} to ${occupancy}!`);
   };
 
@@ -229,23 +280,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       tasksAssigned: 0
     };
     setVolunteers(prev => [newVol, ...prev]);
-    showToast(`🦺 Volunteer application for ${newVol.name} submitted! Pending ASDMA Govt Admin credential verification.`);
+    dbService.saveVolunteer(newVol); // PERSIST TO DATABASE
+    showToast(`🦺 Volunteer application for ${newVol.name} submitted & saved to database! Pending ASDMA Govt Admin verification.`);
   };
 
   const verifyVolunteer = (volId: string) => {
-    setVolunteers(prev => prev.map(v => v.id === volId ? { ...v, isVerified: true } : v));
-    showToast(`✅ ASDMA Govt Admin verified volunteer credential for ${volId}! Badge activated.`);
+    setVolunteers(prev => prev.map(v => {
+      if (v.id === volId) {
+        const updated = { ...v, isVerified: true };
+        dbService.saveVolunteer(updated); // PERSIST TO DATABASE
+        return updated;
+      }
+      return v;
+    }));
+    showToast(`✅ ASDMA Govt Admin verified volunteer credential for ${volId}! Saved to database.`);
   };
 
   const addNGO = (ngo: NGOInventory) => {
     setNgos(prev => [ngo, ...prev]);
-    showToast(`📦 Registered NGO warehouse "${ngo.ngoName}"!`);
+    dbService.saveNGO(ngo); // PERSIST TO DATABASE
+    showToast(`📦 Registered NGO warehouse "${ngo.ngoName}" in database!`);
   };
 
   const updateNgoStock = (ngoId: string, itemKey: keyof NGOInventory['items'], quantity: number) => {
     setNgos(prev => prev.map(n => {
       if (n.id === ngoId) {
-        return {
+        const updated = {
           ...n,
           items: {
             ...n.items,
@@ -254,6 +314,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           distributionCount: n.distributionCount + 1,
           lastUpdated: new Date().toLocaleTimeString()
         };
+        dbService.saveNGO(updated); // PERSIST TO DATABASE
+        return updated;
       }
       return n;
     }));
@@ -265,7 +327,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: `MP-${Math.floor(1000 + Math.random() * 9000)}`
     };
     setMissingPersons(prev => [newPerson, ...prev]);
-    showToast(`🔍 Missing person report for "${newPerson.fullName}" published!`);
+    dbService.saveMissingPerson(newPerson); // PERSIST TO DATABASE
+    showToast(`🔍 Missing person report for "${newPerson.fullName}" published & saved to database!`);
   };
 
   const addRoadReport = (report: Omit<RoadReport, 'id' | 'reportedAt'>) => {
@@ -275,7 +338,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       reportedAt: new Date().toLocaleTimeString()
     };
     setRoadReports(prev => [newRoad, ...prev]);
-    showToast(`🚧 Road obstacle report for "${newRoad.roadName}" published on Live Map!`);
+    dbService.saveRoadReport(newRoad); // PERSIST TO DATABASE
+    showToast(`🚧 Road obstacle report for "${newRoad.roadName}" published & saved to database!`);
   };
 
   const addDonation = (donationData: Omit<Donation, 'id' | 'receiptNo' | 'timestamp'>) => {
@@ -286,7 +350,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       timestamp: new Date().toLocaleDateString()
     };
     setDonations(prev => [newDonation, ...prev]);
-    showToast(`🎉 Thank you ${newDonation.donorName}! Official 80G E-Receipt #${newDonation.receiptNo} generated.`);
+    dbService.saveDonation(newDonation); // PERSIST TO DATABASE
+    showToast(`🎉 Thank you ${newDonation.donorName}! Official 80G E-Receipt #${newDonation.receiptNo} saved to database.`);
   };
 
   return (
