@@ -266,8 +266,9 @@ export const Header: React.FC = () => {
             <button
               onClick={() => setIsAuthModalOpen(true)}
               className={`hidden sm:flex px-2.5 py-1.5 rounded-xl text-xs font-bold border items-center gap-1.5 transition-all ${currentRoleCfg.badgeColor}`}
+              title="Switch Active Disaster Response Persona"
             >
-              <LogIn className="w-3.5 h-3.5" />
+              <UserCheck className="w-3.5 h-3.5" />
               <span className="hidden md:inline">{currentRoleCfg.title}</span>
             </button>
 
