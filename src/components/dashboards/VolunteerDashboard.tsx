@@ -251,8 +251,9 @@ export const VolunteerDashboard: React.FC = () => {
 
       {/* FIX 2: Active Volunteer Details Modal */}
       {selectedVolunteer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white border border-emerald-200 w-full max-w-md rounded-3xl p-6 space-y-4 text-xs text-slate-900 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="flex min-h-full items-start justify-center p-4 sm:p-6">
+          <div className="bg-white border border-emerald-200 w-full max-w-md rounded-3xl p-6 space-y-4 text-xs text-slate-900 shadow-2xl relative my-6">
             <button
               onClick={() => setSelectedVolunteer(null)}
               className="absolute top-5 right-5 text-slate-400 hover:text-slate-900 bg-slate-100 p-1.5 rounded-full"
@@ -324,6 +325,7 @@ export const VolunteerDashboard: React.FC = () => {
                 )}
               </div>
             </div>
+          </div>
           </div>
         </div>
       )}

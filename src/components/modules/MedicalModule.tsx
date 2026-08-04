@@ -142,8 +142,9 @@ export const MedicalModule: React.FC = () => {
 
       {/* Modal to Add Hospital */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl p-6 space-y-4 text-xs text-slate-900 shadow-2xl">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm">
+          <div className="flex min-h-full items-start justify-center p-4 sm:p-6">
+          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl p-6 space-y-4 text-xs text-slate-900 shadow-2xl my-6">
             <h3 className="font-bold text-base">Register Emergency Hospital / Medical Facility</h3>
             <form onSubmit={handleAddHospital} className="space-y-3">
               <div>
@@ -205,6 +206,7 @@ export const MedicalModule: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
           </div>
         </div>
       )}

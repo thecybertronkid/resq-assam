@@ -121,8 +121,9 @@ export const RoadStatusModule: React.FC = () => {
 
       {/* Modal to Report Road Hazard with AI Photo Telemetrics */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white border border-purple-200 w-full max-w-md rounded-3xl p-6 space-y-4 text-xs text-slate-900 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm">
+          <div className="flex min-h-full items-start justify-center p-4 sm:p-6">
+          <div className="bg-white border border-purple-200 w-full max-w-md rounded-3xl p-6 space-y-4 text-xs text-slate-900 shadow-2xl my-6">
             <h3 className="font-bold text-base">Report Road Obstacle / Hazard</h3>
             <form onSubmit={handleSubmit} className="space-y-3">
               {/* FIX 6: AI Photo Telemetrics Upload */}
@@ -229,6 +230,7 @@ export const RoadStatusModule: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
           </div>
         </div>
       )}
