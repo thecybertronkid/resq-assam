@@ -19,40 +19,66 @@ import { PublicAnalytics } from './components/modules/PublicAnalytics';
 import { SosModal } from './components/sos/SosModal';
 import { AuthModal } from './components/auth/AuthModal';
 import { AiAssistantDrawer } from './components/common/AiAssistantDrawer';
-import { Bell } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Info } from 'lucide-react';
 
 const MainContent: React.FC = () => {
   const { activeTab, toastMessage } = useApp();
+
+  // Detect toast type from emoji prefix
+  const isSuccess = toastMessage?.startsWith('✅') || toastMessage?.startsWith('🎉') || toastMessage?.startsWith('🟢') || toastMessage?.startsWith('⛺') || toastMessage?.startsWith('🦺') || toastMessage?.startsWith('🔍');
+  const isWarning = toastMessage?.startsWith('⚠️') || toastMessage?.startsWith('💾') || toastMessage?.startsWith('❌');
+  const isCritical = toastMessage?.startsWith('🆘') || toastMessage?.startsWith('🚨');
+
+  const toastBg = isCritical
+    ? 'bg-rose-600 border-rose-500'
+    : isSuccess
+    ? 'bg-emerald-700 border-emerald-500'
+    : isWarning
+    ? 'bg-amber-600 border-amber-500'
+    : 'bg-slate-900 border-slate-700';
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-pink-400 selection:text-white">
       {/* Header Bar */}
       <Header />
 
-      {/* Toast Notification Banner */}
+      {/* Toast Notification — bottom-right, styled by type */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 border border-slate-700 text-white text-xs font-semibold px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom duration-200">
-          <Bell className="w-4 h-4 text-blue-400 animate-bounce" />
-          <span>{toastMessage}</span>
+        <div
+          className={`fixed bottom-5 right-4 sm:right-6 z-[60] ${toastBg} text-white text-xs font-semibold px-4 py-3 rounded-2xl shadow-2xl flex items-start gap-3 max-w-[calc(100vw-2rem)] sm:max-w-sm border animate-fade-in`}
+          style={{ boxShadow: isCritical ? '0 0 0 4px rgba(244,63,94,0.2)' : undefined }}
+        >
+          <div className="shrink-0 mt-0.5">
+            {isCritical ? (
+              <AlertTriangle className="w-4 h-4 text-rose-200 animate-pulse" />
+            ) : isSuccess ? (
+              <CheckCircle className="w-4 h-4 text-emerald-200" />
+            ) : (
+              <Info className="w-4 h-4 text-slate-300" />
+            )}
+          </div>
+          <span className="leading-relaxed">{toastMessage}</span>
         </div>
       )}
 
-      {/* Main Content Body */}
+      {/* Page Transition Wrapper */}
       <main className="flex-1">
-        {activeTab === 'home' && <LandingPage />}
-        {activeTab === 'map' && <LiveIncidentMap />}
-        {activeTab === 'citizen' && <CitizenDashboard />}
-        {activeTab === 'rescue' && <RescueDashboard />}
-        {activeTab === 'volunteer' && <VolunteerDashboard />}
-        {activeTab === 'ngo' && <NgoDashboard />}
-        {activeTab === 'admin' && <AdminDashboard />}
-        {activeTab === 'camps' && <ReliefCampsModule />}
-        {activeTab === 'missing' && <MissingPersonModule />}
-        {activeTab === 'roads' && <RoadStatusModule />}
-        {activeTab === 'medical' && <MedicalModule />}
-        {activeTab === 'alerts' && <DisasterAlertsModule />}
-        {activeTab === 'donations' && <DonationPortal />}
-        {activeTab === 'public' && <PublicAnalytics />}
+        <div key={activeTab} className="animate-fade-in">
+          {activeTab === 'home' && <LandingPage />}
+          {activeTab === 'map' && <LiveIncidentMap />}
+          {activeTab === 'citizen' && <CitizenDashboard />}
+          {activeTab === 'rescue' && <RescueDashboard />}
+          {activeTab === 'volunteer' && <VolunteerDashboard />}
+          {activeTab === 'ngo' && <NgoDashboard />}
+          {activeTab === 'admin' && <AdminDashboard />}
+          {activeTab === 'camps' && <ReliefCampsModule />}
+          {activeTab === 'missing' && <MissingPersonModule />}
+          {activeTab === 'roads' && <RoadStatusModule />}
+          {activeTab === 'medical' && <MedicalModule />}
+          {activeTab === 'alerts' && <DisasterAlertsModule />}
+          {activeTab === 'donations' && <DonationPortal />}
+          {activeTab === 'public' && <PublicAnalytics />}
+        </div>
       </main>
 
       {/* Footer */}
