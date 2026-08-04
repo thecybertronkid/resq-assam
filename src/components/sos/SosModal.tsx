@@ -379,7 +379,7 @@ export const SosModal: React.FC = () => {
           {/* Submit CTA */}
           <div className="pt-2 flex items-center justify-between border-t border-slate-200">
             <p className="text-[11px] text-slate-500 font-medium">
-              * By submitting, your GPS and details are transmitted to ASDMA 24x7 War Room.
+              * By submitting, your GPS and details are transmitted to the 24x7 State Disaster Control Room.
             </p>
             <button
               type="submit"

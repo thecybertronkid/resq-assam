@@ -184,7 +184,7 @@ export const VolunteerDashboard: React.FC = () => {
                 className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-500/20"
               >
                 <Radio className="w-4 h-4" />
-                <span>Submit Volunteer Application (Pending ASDMA Verification)</span>
+                <span>Submit Volunteer Application (Pending Admin Verification)</span>
               </button>
             </form>
           </div>
@@ -218,7 +218,7 @@ export const VolunteerDashboard: React.FC = () => {
                         <h3 className="font-bold text-sm text-slate-900">{vol.name}</h3>
                         {vol.isVerified ? (
                           <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded border border-emerald-300 flex items-center gap-1">
-                            <ShieldCheck className="w-3 h-3 text-emerald-600" /> ASDMA Verified
+                            <ShieldCheck className="w-3 h-3 text-emerald-600" /> Verified Responder
                           </span>
                         ) : (
                           <span className="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-300 flex items-center gap-1">
@@ -314,12 +314,12 @@ export const VolunteerDashboard: React.FC = () => {
                 {selectedVolunteer.isVerified ? (
                   <div className="bg-emerald-100 border border-emerald-300 p-2.5 rounded-xl text-emerald-900 font-bold text-center flex items-center justify-center gap-1.5">
                     <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                    <span>ASDMA Govt Credential Verified</span>
+                    <span>Credential Verified</span>
                   </div>
                 ) : (
                   <div className="bg-amber-50 border border-amber-300 p-2.5 rounded-xl text-amber-900 font-bold text-center flex items-center justify-center gap-1.5">
                     <Clock className="w-4 h-4 text-amber-700" />
-                    <span>Pending ASDMA Govt Admin Verification</span>
+                    <span>Pending Admin Verification</span>
                   </div>
                 )}
               </div>

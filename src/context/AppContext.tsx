@@ -135,7 +135,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const handleOnline = () => {
       setIsOnline(true);
-      showToast('🟢 Back Online! Synchronizing offline emergency reports with Supabase & ASDMA servers...');
+      showToast('🟢 Back Online! Synchronizing offline emergency reports with Supabase servers...');
       const queue = getOfflineSosQueue();
       if (queue.length > 0) {
         queue.forEach((qReport: Partial<IncidentReport>) => {
@@ -192,7 +192,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         dbService.saveVolunteer(updatedVol);
         supabaseClient.syncVolunteer(updatedVol);
 
-        showToast(`🚨 CRITICAL DISPATCH: Auto-assigned to nearest ASDMA Verified Volunteer [${activeVerifiedVol.name}] in ${activeVerifiedVol.district}!`);
+        showToast(`🚨 CRITICAL DISPATCH: Auto-assigned to nearest Verified Volunteer [${activeVerifiedVol.name}] in ${activeVerifiedVol.district}!`);
       }
     }
 
@@ -229,7 +229,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       supabaseClient.syncIncident(fullReport); // SYNC TO SUPABASE POSTGRESQL
 
       if (initialStatus === 'submitted') {
-        showToast(`🆘 SOS Report ${id} submitted & synced to Supabase database! Transmitted to ASDMA & NDRF Patgaon Control Room.`);
+        showToast(`🆘 SOS Report ${id} submitted & synced to Supabase database! Transmitted to NDRF Patgaon Control Room.`);
       }
     }
   };
@@ -287,7 +287,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setVolunteers(prev => [newVol, ...prev]);
     dbService.saveVolunteer(newVol);
     supabaseClient.syncVolunteer(newVol);
-    showToast(`🦺 Volunteer application for ${newVol.name} submitted & synced to Supabase database! Pending ASDMA Govt Admin verification.`);
+    showToast(`🦵 Volunteer application for ${newVol.name} submitted & synced to Supabase database! Pending Admin verification.`);
   };
 
   const verifyVolunteer = (volId: string) => {
@@ -300,7 +300,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
       return v;
     }));
-    showToast(`✅ ASDMA Govt Admin verified volunteer credential for ${volId}! Saved to Supabase database.`);
+    showToast(`✅ Admin verified volunteer credential for ${volId}! Saved to Supabase database.`);
   };
 
   const addNGO = (ngo: NGOInventory) => {

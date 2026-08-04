@@ -26,12 +26,12 @@ export const Footer: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-heading font-extrabold text-slate-900 text-base">ResQ Assam</h3>
-                  <span className="text-[10px] text-rose-700 font-extrabold uppercase bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">ASDMA Cell</span>
+                  <span className="text-[10px] text-rose-700 font-extrabold uppercase bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">Assam Relief</span>
                 </div>
               </div>
 
               <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                Unified disaster rescue, volunteer coordination, and emergency telemetry platform for Assam State Disaster Management Authority (ASDMA).
+                Unified disaster rescue, volunteer coordination, and emergency telemetry platform serving the people of Assam.
               </p>
             </div>
 
@@ -41,7 +41,7 @@ export const Footer: React.FC = () => {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
                 </span>
-                <span>ASDMA Telemetry Engine Online</span>
+                <span>Disaster Telemetry Engine Online</span>
               </div>
             </div>
           </div>
@@ -57,7 +57,7 @@ export const Footer: React.FC = () => {
 
             <ul className="space-y-2 text-xs font-semibold">
               <li className="flex items-center justify-between bg-white p-2 rounded-xl border border-slate-200/80">
-                <span className="text-slate-700 text-[11px]">ASDMA Control Room:</span>
+                <span className="text-slate-700 text-[11px]">State Disaster Control Room:</span>
                 <a href="tel:1070" className="text-rose-600 font-extrabold hover:underline bg-rose-50 px-2 py-0.5 rounded border border-rose-200">1070 / 1077</a>
               </li>
               <li className="flex items-center justify-between bg-white p-2 rounded-xl border border-slate-200/80">
@@ -144,7 +144,7 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-2">
             <span>© 2026 ResQ Assam. All rights reserved.</span>
             <span>•</span>
-            <span>Assam State Disaster Management Authority (ASDMA)</span>
+            <span>© 2026 ResQ Assam. All rights reserved.</span>
           </div>
 
           <div className="flex items-center gap-4 text-[11px] font-bold text-slate-600">

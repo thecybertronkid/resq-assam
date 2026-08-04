@@ -100,12 +100,12 @@ export const Header: React.FC = () => {
     },
     admin: { 
       title: 'Govt Admin', 
-      dashLabel: 'ASDMA War Room',
+      dashLabel: 'Admin Command Center',
       dashTab: 'admin',
       badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
       ctaLabel: 'STATEWIDE ALERT',
       ctaIcon: Building,
-      ctaAction: () => { setActiveTab('admin'); showToast('🏛️ ASDMA Statewide Emergency Broadcast Panel Loaded!'); }
+      ctaAction: () => { setActiveTab('admin'); showToast('🏛️ Statewide Emergency Broadcast Panel Loaded!'); }
     }
   };
 
@@ -144,7 +144,7 @@ export const Header: React.FC = () => {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
           </span>
-          <span>ASDMA LIVE:</span>
+          <span>DISASTER LIVE:</span>
         </div>
 
         <div className="overflow-hidden flex-1">
@@ -154,7 +154,7 @@ export const Header: React.FC = () => {
                 🌊 {g.station}: <strong>{g.waterLevelMeter}m</strong> — <span className="font-extrabold uppercase">{g.trend}</span>
               </span>
             ))}
-            <span className="font-medium">📞 ASDMA Helpline: 1070 / 1077 &nbsp;|&nbsp; NDRF Patgaon: 0361-2840284 &nbsp;|&nbsp; Ambulance: 108</span>
+            <span className="font-medium">📞 State Disaster Helpline: 1070 / 1077 &nbsp;|&nbsp; NDRF Patgaon: 0361-2840284 &nbsp;|&nbsp; Ambulance: 108</span>
           </div>
         </div>
 
@@ -183,7 +183,7 @@ export const Header: React.FC = () => {
                 ResQ <span className="text-rose-500">Assam</span>
               </span>
               <span className="bg-rose-50 text-rose-700 text-[8px] sm:text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border border-rose-200 uppercase tracking-wider">
-                ASDMA
+                ASSAM
               </span>
             </div>
           </div>

@@ -84,7 +84,7 @@ export const LandingPage: React.FC = () => {
             <div className="pt-4 sm:pt-6 border-t border-slate-200/80 grid grid-cols-3 gap-2 sm:gap-4 text-[11px] sm:text-xs text-slate-600 font-semibold">
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>ASDMA Verified</span>
+                <span>State Verified</span>
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <CheckCircle className="w-4 h-4 text-sky-600 shrink-0" />
@@ -189,7 +189,7 @@ export const LandingPage: React.FC = () => {
       {/* DISASTER MODULE QUICK NAVIGATION TILES */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="text-center space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900">ASDMA Disaster Command Modules</h2>
+          <h2 className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900">Disaster Command Modules</h2>
           <p className="text-xs sm:text-sm text-slate-600 font-medium">Click any module tile for instant access to specialized rescue tools.</p>
         </div>
 

@@ -109,7 +109,7 @@ export const DonationPortal: React.FC = () => {
         key: RAZORPAY_KEY_ID,
         amount: amount * 100, // amount in paise
         currency: 'INR',
-        name: 'ResQ Assam ASDMA Relief Fund',
+        name: 'ResQ Assam Relief Fund',
         description: 'Tax-Exempt Disaster Relief Contribution (Section 80G)',
         image: 'https://cdn-icons-png.flaticon.com/512/3063/3063822.png',
         handler: function (response: any) {
@@ -378,7 +378,7 @@ export const DonationPortal: React.FC = () => {
                       R
                     </div>
                     <div>
-                      <h2 className="font-heading font-extrabold text-xl text-slate-900 tracking-tight">ResQ Assam ASDMA Relief Fund</h2>
+                      <h2 className="font-heading font-extrabold text-xl text-slate-900 tracking-tight">ResQ Assam Relief Fund</h2>
                       <p className="text-[11px] text-rose-700 font-extrabold uppercase tracking-wide">Government of Assam • Revenue & Disaster Management Department</p>
                     </div>
                   </div>
@@ -450,7 +450,7 @@ export const DonationPortal: React.FC = () => {
 
                 <div className="text-center space-y-1">
                   <div className="w-24 h-12 border border-slate-300 rounded-lg bg-slate-50 flex items-center justify-center text-[10px] font-mono text-slate-400 mx-auto">
-                    [ASDMA DIGITAL SEAL]
+                    [STATE DISASTER DIGITAL SEAL]
                   </div>
                   <span className="font-bold text-slate-900 block text-[10px]">Nodal Finance Officer</span>
                   <span className="text-[9px] text-slate-500 block">ResQ Assam Control Room</span>

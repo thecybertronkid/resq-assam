@@ -20,7 +20,7 @@ export const PublicAnalytics: React.FC = () => {
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs uppercase font-extrabold text-sky-800 tracking-wider flex items-center gap-1.5">
               <Radio className="w-4 h-4 text-emerald-600 animate-pulse" />
-              ASDMA & AXOM RELIEF NETWORK LIVE SYNC ACTIVE
+              AXOM RELIEF NETWORK LIVE SYNC ACTIVE
             </span>
             <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-300">
               Synced at {telemetry.lastSyncedAt}
@@ -46,7 +46,7 @@ export const PublicAnalytics: React.FC = () => {
         <div className="bg-white p-5 rounded-3xl border border-emerald-200 shadow-sm space-y-1">
           <span className="text-xs text-slate-500 font-bold block">Statewide Affected Population</span>
           <div className="text-3xl font-heading font-extrabold text-emerald-700">{telemetry.totalAffectedPopulation.toLocaleString()}</div>
-          <span className="text-[11px] text-emerald-700 font-bold">✓ Synced with ASDMA War Room</span>
+          <span className="text-[11px] text-emerald-700 font-bold">✓ Synced with State Command Center</span>
         </div>
 
         <div className="bg-white p-5 rounded-3xl border border-sky-200 shadow-sm space-y-1">
@@ -73,7 +73,7 @@ export const PublicAnalytics: React.FC = () => {
         <div className="flex items-center justify-between">
           <h2 className="text-base font-heading font-bold text-slate-900 flex items-center gap-2">
             <Activity className="w-5 h-5 text-rose-600 animate-pulse" />
-            Live River Level Gauges Telemetry (CWC / ASDMA Stream)
+            Live River Level Gauges Telemetry (CWC / State Stream)
           </h2>
           <span className="text-xs text-slate-500 font-semibold">Auto-refreshing every 15s</span>
         </div>

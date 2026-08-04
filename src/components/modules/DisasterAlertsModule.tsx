@@ -37,7 +37,7 @@ export const DisasterAlertsModule: React.FC = () => {
     };
     setLocalAlerts([newAlert, ...localAlerts]);
     setIsModalOpen(false);
-    showToast(`🚨 ASDMA Warning Bulletin "${title}" issued to ${district}! Push & SMS broadcast initiated.`);
+    showToast(`🚨 Warning Bulletin "${title}" issued to ${district}! Push & SMS broadcast initiated.`);
   };
 
   return (
@@ -46,7 +46,7 @@ export const DisasterAlertsModule: React.FC = () => {
         <div>
           <span className="text-xs uppercase font-extrabold text-rose-800 tracking-wider flex items-center gap-1.5">
             <Radio className="w-4 h-4 text-rose-600 animate-pulse" />
-            ASDMA REALTIME RIVER GAUGES & METEOROLOGICAL BULLETINS
+            STATE REALTIME RIVER GAUGES & METEOROLOGICAL BULLETINS
           </span>
           <h1 className="text-2xl font-heading font-extrabold text-slate-900">Live Disaster Warning Broadcasts</h1>
           <p className="text-xs text-slate-600 font-medium">Real-time alerts for Brahmaputra river discharge, dam releases, and flash landslides.</p>
@@ -129,7 +129,7 @@ export const DisasterAlertsModule: React.FC = () => {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
           <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl p-6 space-y-4 text-xs text-slate-900 shadow-2xl">
-            <h3 className="font-bold text-base">Issue ASDMA Disaster Warning Bulletin</h3>
+            <h3 className="font-bold text-base">Issue State Disaster Warning Bulletin</h3>
             <form onSubmit={handleCreateAlert} className="space-y-3">
               <div>
                 <label className="block text-slate-700 mb-1 font-bold">Alert Title *</label>

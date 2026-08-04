@@ -46,11 +46,11 @@ export const AdminDashboard: React.FC = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `ASDMA_Statewide_Disaster_Report_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `Statewide_Disaster_Report_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast(`📄 Downloaded ASDMA Statewide Disaster CSV Report (${incidents.length} incidents logged)!`);
+    showToast(`📄 Downloaded Statewide Disaster CSV Report (${incidents.length} incidents logged)!`);
   };
 
   return (
@@ -60,7 +60,7 @@ export const AdminDashboard: React.FC = () => {
         <div>
           <span className="text-xs uppercase font-extrabold text-amber-800 tracking-wider flex items-center gap-1.5">
             <Radio className="w-4 h-4 text-amber-600 animate-pulse" />
-            ASDMA STATEWIDE EMERGENCY COMMAND & AI MODERATION
+            STATEWIDE EMERGENCY COMMAND & AI MODERATION
           </span>
           <h1 className="text-2xl font-heading font-extrabold text-slate-900">Government Admin War Room</h1>
           <p className="text-xs text-slate-600 font-medium">AI duplicate detection, volunteer approvals, relief camp oversight, and CSV report export.</p>
@@ -71,7 +71,7 @@ export const AdminDashboard: React.FC = () => {
           className="bg-amber-600 hover:bg-amber-500 text-white font-extrabold px-5 py-2.5 rounded-xl shadow-md shadow-amber-500/20 text-xs flex items-center gap-2"
         >
           <FileSpreadsheet className="w-4 h-4" />
-          Export ASDMA Statewide CSV Report
+          Export Statewide Disaster CSV Report
         </button>
       </div>
 
@@ -157,7 +157,7 @@ export const AdminDashboard: React.FC = () => {
       {activeTab === 'volunteers' && (
         <div className="space-y-4">
           <p className="text-xs text-slate-600 font-medium">
-            Verify volunteer credentials to activate official ASDMA Responder badges for critical dispatch auto-assignment.
+            Verify volunteer credentials to activate official Responder badges for critical dispatch auto-assignment.
           </p>
 
           {volunteers.length === 0 ? (
@@ -173,7 +173,7 @@ export const AdminDashboard: React.FC = () => {
                       <h4 className="font-bold text-slate-900 text-sm">{v.name}</h4>
                       {v.isVerified ? (
                         <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded border border-emerald-300 flex items-center gap-1">
-                          <ShieldCheck className="w-3 h-3 text-emerald-600" /> ASDMA Verified
+                          <ShieldCheck className="w-3 h-3 text-emerald-600" /> Verified Responder
                         </span>
                       ) : (
                         <span className="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-300 flex items-center gap-1">

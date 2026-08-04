@@ -18,7 +18,7 @@ export const AXOM_RELIEF_EMERGENCY_DATA = {
   platformName: "Axom Relief Network (Axom Stands Together)",
   websiteUrl: "https://www.axomrelief.com/",
   stateHelplines: [
-    { label: "ASDMA State Control Room", phone: "1070" },
+    { label: "State Disaster Control Room", phone: "1070" },
     { label: "District Control Room Helpline", phone: "1077" },
     { label: "Axom Relief Emergency Dispatch", phone: "+91 361 2237011" },
     { label: "NDRF 1st Bn Patgaon Control", phone: "+91 361 2840140" },
@@ -40,7 +40,7 @@ export const INITIAL_RIVER_GAUGES = [
   { station: 'Tezpur (Sonitpur)', waterLevelMeter: 65.80, dangerLevelMeter: 65.23, trend: 'FALLING' as const }
 ];
 
-// Live ASDMA Live Sync Simulator
+// Live State Disaster Sync Simulator
 export class AsdmaSyncEngine {
   private static instance: AsdmaSyncEngine;
   private listeners: ((telemetry: LiveTelemetryStatus) => void)[] = [];
@@ -82,7 +82,7 @@ export class AsdmaSyncEngine {
   private startLiveSync() {
     if (this.intervalId) return;
 
-    // Simulate live WebSocket/REST sync every 15 seconds from ASDMA + Axom Relief
+    // Simulate live WebSocket/REST sync every 15 seconds from State Disaster Network + Axom Relief
     this.intervalId = setInterval(() => {
       // Small real-time fluctuations
       const deltaPopulation = Math.floor(Math.random() * 20) - 5;

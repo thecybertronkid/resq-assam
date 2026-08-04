@@ -46,7 +46,7 @@ export const AiAssistantDrawer: React.FC = () => {
     {
       id: 'msg-1',
       sender: 'ai',
-      text: '🙏 Namaskar! I am your ResQ AI Emergency Copilot, connected live to ASDMA War Room & Axom Relief Network. How can I assist your safety today?',
+      text: '🙏 Namaskar! I am your ResQ AI Emergency Copilot, connected live to State Disaster Control Room & Axom Relief Network. How can I assist your safety today?',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -102,14 +102,14 @@ export const AiAssistantDrawer: React.FC = () => {
         const openCamps = camps.slice(0, 3).map(c => `${c.name} (${c.district}) - ${c.currentOccupancy}/${c.capacity} occupied`).join('\n• ');
         aiResponseText = `⛺ Verified open relief shelters near affected districts:\n• ${openCamps}\n\nYou can view live capacity and amenities on the Relief Camps tab.`;
       } else if (lower.includes('boat') || lower.includes('sos') || lower.includes('rescue')) {
-        aiResponseText = `🚨 For immediate evacuation or NDRF motorized boat dispatch, click the red "SOS Emergency" button or call ASDMA 1070. AI has calculated high priority for stranded families.`;
+        aiResponseText = `🚨 For immediate evacuation or NDRF motorized boat dispatch, click the red "SOS Emergency" button or call State Disaster Helpline 1070. AI has calculated high priority for stranded families.`;
       } else if (lower.includes('helpline') || lower.includes('phone') || lower.includes('number')) {
-        aiResponseText = `📞 ASDMA & Axom Relief Network Helplines:\n• ASDMA State Control Room: 1070 / 1077\n• Axom Relief Emergency Dispatch: +91 361 2237011\n• NDRF 1st Bn Patgaon: +91 361 2840140\n• Medical Ambulance: 108`;
+        aiResponseText = `📞 State Disaster Control Room Helplines:\n• State Control Room: 1070 / 1077\n• Axom Relief Emergency Dispatch: +91 361 2237011\n• NDRF 1st Bn Patgaon: +91 361 2840140\n• Medical Ambulance: 108`;
       } else if (lower.includes('river') || lower.includes('water') || lower.includes('level')) {
         const gauges = telemetry.activeRiverGauges.map(g => `${g.station}: ${g.waterLevelMeter}m (${g.trend})`).join('\n• ');
-        aiResponseText = `🌊 Live River Level Telemetry (CWC / ASDMA Stream):\n• ${gauges}\n\nBrahmaputra in Guwahati is currently flowing 0.44m above danger level.`;
+        aiResponseText = `🌊 Live River Level Telemetry (CWC / State Stream):\n• ${gauges}\n\nBrahmaputra in Guwahati is currently flowing 0.44m above danger level.`;
       } else {
-        aiResponseText = `🤖 I have logged your query into the ASDMA disaster telemetry engine. If you are stranded or need urgent food/water, use the SOS button to pin your GPS location directly to NDRF commanders.`;
+        aiResponseText = `🤖 I have logged your query into the disaster telemetry engine. If you are stranded or need urgent food/water, use the SOS button to pin your GPS location directly to NDRF commanders.`;
       }
 
       const aiMsg: ChatMessage = {
@@ -172,7 +172,7 @@ export const AiAssistantDrawer: React.FC = () => {
             </div>
             <div>
               <h3 className="font-heading font-extrabold text-slate-900 text-sm sm:text-base">ResQ AI Emergency Copilot</h3>
-              <p className="text-[10px] sm:text-[11px] text-sky-700 font-bold">ASDMA & Axom Relief Intelligence</p>
+              <p className="text-[10px] sm:text-[11px] text-sky-700 font-bold">Axom Relief Intelligence</p>
             </div>
           </div>
           <button
@@ -219,7 +219,7 @@ export const AiAssistantDrawer: React.FC = () => {
               {[
                 { label: '⛺ Nearest Relief Camps', query: 'Where is the nearest open relief camp?' },
                 { label: '🚤 Request Rescue Boat', query: 'How do I request an NDRF rescue boat?' },
-                { label: '📞 ASDMA Helplines', query: 'Show ASDMA & Axom Relief helpline numbers' },
+                { label: '📞 Disaster Helplines', query: 'Show State Disaster Control Room & Axom Relief helpline numbers' },
                 { label: '🌊 River Gauges', query: 'What is the current Brahmaputra river level?' }
               ].map(chip => (
                 <button
@@ -446,7 +446,7 @@ export const AiAssistantDrawer: React.FC = () => {
       </div>
 
       <div className="pt-3 border-t border-slate-100 text-[10px] text-slate-400 font-medium shrink-0 flex justify-between">
-        <span>ResQ AI Engine connected to ASDMA.</span>
+        <span>ResQ AI Engine connected to State Disaster Network.</span>
         <span className="text-emerald-600 font-bold">● Online</span>
       </div>
     </div>

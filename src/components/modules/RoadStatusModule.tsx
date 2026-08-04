@@ -48,7 +48,7 @@ export const RoadStatusModule: React.FC = () => {
       details: details || 'Road hazard logged by field responder.',
       lat: 26.1500 + Math.random() * 0.5,
       lng: 91.7500 + Math.random() * 0.5,
-      reportedBy: 'ASDMA Field Inspector',
+      reportedBy: 'State Field Inspector',
       photoUrl: photoPreview || undefined,
       telemetrics: calculatedTelemetrics ? {
         waterDepthFeet: calculatedTelemetrics.waterDepthFeet,

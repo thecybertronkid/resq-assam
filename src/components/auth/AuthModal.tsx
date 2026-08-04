@@ -39,7 +39,7 @@ export const AuthModal: React.FC = () => {
     },
     { 
       id: 'admin', 
-      title: 'Govt / ASDMA Admin', 
+      title: 'Govt / Admin', 
       desc: 'Statewide dashboard, AI duplicate detection, relief camp oversight', 
       icon: '🏛️',
       features: ['AI Duplicate Moderation', 'Volunteer Approvals', 'State CSV Exporter', 'District Inundation']
