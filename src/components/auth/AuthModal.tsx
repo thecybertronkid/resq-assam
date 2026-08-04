@@ -37,31 +37,31 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-800 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+      <div className="bg-white border border-pink-200 w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-slate-900">
         {/* Header */}
-        <div className="bg-slate-950 p-5 border-b border-slate-800 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-pink-500 via-rose-500 to-sky-500 p-5 text-white flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
-              <ShieldCheck className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+              <ShieldCheck className="w-6 h-6 text-white" />
             </div>
             <div>
               <h3 className="font-heading font-bold text-white text-base">Portal Access & Role Switcher</h3>
-              <p className="text-xs text-slate-400">Select your authorized responder role to proceed</p>
+              <p className="text-xs text-pink-100 font-medium">Select your authorized responder role to proceed</p>
             </div>
           </div>
           <button
             onClick={() => setIsAuthModalOpen(false)}
-            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300"
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-6 space-y-6 text-xs text-slate-200">
+        <div className="p-6 space-y-6 text-xs text-slate-700">
           {/* Role Selection */}
           <div>
-            <label className="block text-slate-400 font-semibold mb-2">1. Select Persona Role:</label>
+            <label className="block text-slate-700 font-bold mb-2">1. Select Persona Role:</label>
             <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
               {rolesList.map(r => (
                 <div
@@ -69,18 +69,18 @@ export const AuthModal: React.FC = () => {
                   onClick={() => setRole(r.id)}
                   className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
                     role === r.id
-                      ? 'bg-blue-950/40 border-blue-500 text-white shadow-md'
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                      ? 'bg-pink-50 border-pink-400 text-pink-900 shadow-sm font-bold'
+                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-pink-300'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-xl">{r.icon}</span>
                     <div>
-                      <h4 className="font-bold text-sm text-white">{r.title}</h4>
-                      <p className="text-[11px] text-slate-400">{r.desc}</p>
+                      <h4 className="font-bold text-sm text-slate-900">{r.title}</h4>
+                      <p className="text-[11px] text-slate-500 font-medium">{r.desc}</p>
                     </div>
                   </div>
-                  {role === r.id && <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />}
+                  {role === r.id && <CheckCircle2 className="w-5 h-5 text-pink-600 shrink-0" />}
                 </div>
               ))}
             </div>
@@ -88,26 +88,26 @@ export const AuthModal: React.FC = () => {
 
           {/* Authentication Method Tabs */}
           <div>
-            <label className="block text-slate-400 font-semibold mb-2">2. Authentication Credentials:</label>
-            <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-800 mb-4">
+            <label className="block text-slate-700 font-bold mb-2">2. Authentication Credentials:</label>
+            <div className="flex rounded-xl bg-slate-100 p-1 border border-slate-200 mb-4 font-bold">
               <button
                 type="button"
                 onClick={() => setAuthMethod('otp')}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold ${authMethod === 'otp' ? 'bg-blue-600 text-white' : 'text-slate-400'}`}
+                className={`flex-1 py-1.5 rounded-lg text-xs ${authMethod === 'otp' ? 'bg-pink-500 text-white shadow-sm' : 'text-slate-600'}`}
               >
                 Mobile OTP
               </button>
               <button
                 type="button"
                 onClick={() => setAuthMethod('email')}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold ${authMethod === 'email' ? 'bg-blue-600 text-white' : 'text-slate-400'}`}
+                className={`flex-1 py-1.5 rounded-lg text-xs ${authMethod === 'email' ? 'bg-pink-500 text-white shadow-sm' : 'text-slate-600'}`}
               >
                 Email & Password
               </button>
               <button
                 type="button"
                 onClick={() => setAuthMethod('google')}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold ${authMethod === 'google' ? 'bg-blue-600 text-white' : 'text-slate-400'}`}
+                className={`flex-1 py-1.5 rounded-lg text-xs ${authMethod === 'google' ? 'bg-pink-500 text-white shadow-sm' : 'text-slate-600'}`}
               >
                 Google SSO
               </button>
@@ -116,35 +116,35 @@ export const AuthModal: React.FC = () => {
             {authMethod === 'otp' && (
               <form onSubmit={!otpSent ? handleSendOtp : handleVerifyLogin} className="space-y-3">
                 <div>
-                  <label className="block text-slate-400 mb-1">Mobile Phone Number</label>
+                  <label className="block text-slate-700 mb-1 font-semibold">Mobile Phone Number</label>
                   <div className="relative flex items-center">
-                    <Phone className="w-4 h-4 absolute left-3 text-slate-500" />
+                    <Phone className="w-4 h-4 absolute left-3 text-slate-400" />
                     <input
                       type="tel"
                       placeholder="+91 98000 00000"
                       value={phone}
                       onChange={e => setPhone(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-white"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-slate-900 font-medium"
                     />
                   </div>
                 </div>
 
                 {otpSent && (
                   <div>
-                    <label className="block text-slate-400 mb-1">Enter 4-Digit OTP Code</label>
+                    <label className="block text-slate-700 mb-1 font-semibold">Enter 4-Digit OTP Code</label>
                     <input
                       type="text"
                       placeholder="1234"
                       value={otp}
                       onChange={e => setOtp(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-bold tracking-widest text-center text-base"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-bold tracking-widest text-center text-base"
                     />
                   </div>
                 )}
 
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs"
+                  className="w-full bg-pink-600 hover:bg-pink-500 text-white font-extrabold py-2.5 rounded-xl text-xs shadow-md shadow-pink-500/20"
                 >
                   {!otpSent ? 'Send Verification OTP' : 'Verify & Launch Dashboard'}
                 </button>
@@ -154,28 +154,28 @@ export const AuthModal: React.FC = () => {
             {authMethod === 'email' && (
               <form onSubmit={handleVerifyLogin} className="space-y-3">
                 <div>
-                  <label className="block text-slate-400 mb-1">Government / Registered Email</label>
+                  <label className="block text-slate-700 mb-1 font-semibold">Government / Registered Email</label>
                   <input
                     type="email"
                     placeholder="responder@resq.gov.in"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 mb-1">Password</label>
+                  <label className="block text-slate-700 mb-1 font-semibold">Password</label>
                   <input
                     type="password"
                     placeholder="••••••••"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs"
+                  className="w-full bg-pink-600 hover:bg-pink-500 text-white font-extrabold py-2.5 rounded-xl text-xs shadow-md"
                 >
                   Authenticate & Login
                 </button>
@@ -184,10 +184,10 @@ export const AuthModal: React.FC = () => {
 
             {authMethod === 'google' && (
               <div className="space-y-3 text-center py-2">
-                <p className="text-slate-400 text-xs">Sign in with authorized Google Workspace account:</p>
+                <p className="text-slate-600 text-xs font-medium">Sign in with authorized Google Workspace account:</p>
                 <button
                   onClick={handleVerifyLogin}
-                  className="w-full bg-white text-slate-900 font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-100"
+                  className="w-full bg-slate-100 text-slate-900 font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-200 border border-slate-200 shadow-sm"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

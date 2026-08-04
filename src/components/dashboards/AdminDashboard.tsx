@@ -53,20 +53,20 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header */}
-      <div className="bg-amber-950/60 border border-amber-800/80 p-6 rounded-3xl flex flex-wrap items-center justify-between gap-4">
+      {/* Header - Amber/Pink Gradient */}
+      <div className="bg-gradient-to-r from-amber-100 via-pink-50 to-emerald-100 border border-amber-200 p-6 rounded-3xl flex flex-wrap items-center justify-between gap-4 shadow-sm">
         <div>
-          <span className="text-xs uppercase font-extrabold text-amber-400 tracking-wider flex items-center gap-1.5">
-            <Radio className="w-4 h-4 text-amber-400 animate-pulse" />
+          <span className="text-xs uppercase font-extrabold text-amber-800 tracking-wider flex items-center gap-1.5">
+            <Radio className="w-4 h-4 text-amber-600 animate-pulse" />
             ASDMA STATEWIDE EMERGENCY COMMAND & AI MODERATION
           </span>
-          <h1 className="text-2xl font-heading font-extrabold text-white">Government Admin War Room</h1>
-          <p className="text-xs text-amber-200">AI duplicate detection, volunteer approvals, relief camp oversight, and CSV report export.</p>
+          <h1 className="text-2xl font-heading font-extrabold text-slate-900">Government Admin War Room</h1>
+          <p className="text-xs text-slate-600 font-medium">AI duplicate detection, volunteer approvals, relief camp oversight, and CSV report export.</p>
         </div>
 
         <button
           onClick={handleExportStatewideReport}
-          className="bg-amber-600 hover:bg-amber-500 text-white font-extrabold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-600/30 text-xs flex items-center gap-2"
+          className="bg-amber-600 hover:bg-amber-500 text-white font-extrabold px-5 py-2.5 rounded-xl shadow-md shadow-amber-500/20 text-xs flex items-center gap-2"
         >
           <FileSpreadsheet className="w-4 h-4" />
           Export ASDMA Statewide CSV Report
@@ -74,11 +74,11 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-800 space-x-4 text-xs font-bold">
+      <div className="flex border-b border-slate-200 space-x-4 text-xs font-bold">
         <button
           onClick={() => setActiveTab('duplicates')}
           className={`pb-3 flex items-center gap-2 ${
-            activeTab === 'duplicates' ? 'text-amber-400 border-b-2 border-amber-400' : 'text-slate-400'
+            activeTab === 'duplicates' ? 'text-pink-600 border-b-2 border-pink-500' : 'text-slate-500'
           }`}
         >
           <Sparkles className="w-4 h-4" />
@@ -87,7 +87,7 @@ export const AdminDashboard: React.FC = () => {
         <button
           onClick={() => setActiveTab('volunteers')}
           className={`pb-3 flex items-center gap-2 ${
-            activeTab === 'volunteers' ? 'text-amber-400 border-b-2 border-amber-400' : 'text-slate-400'
+            activeTab === 'volunteers' ? 'text-pink-600 border-b-2 border-pink-500' : 'text-slate-500'
           }`}
         >
           <Users className="w-4 h-4" />
@@ -96,7 +96,7 @@ export const AdminDashboard: React.FC = () => {
         <button
           onClick={() => setActiveTab('heatmap')}
           className={`pb-3 flex items-center gap-2 ${
-            activeTab === 'heatmap' ? 'text-amber-400 border-b-2 border-amber-400' : 'text-slate-400'
+            activeTab === 'heatmap' ? 'text-pink-600 border-b-2 border-pink-500' : 'text-slate-500'
           }`}
         >
           <BarChart3 className="w-4 h-4" />
@@ -107,39 +107,39 @@ export const AdminDashboard: React.FC = () => {
       {/* TAB 1: AI DUPLICATE MODERATION */}
       {activeTab === 'duplicates' && (
         <div className="space-y-4">
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-600 font-medium">
             Our geospatial AI engine cross-references GPS radius (&lt;500m) and village keywords to highlight potential duplicate user reports.
           </p>
 
           {duplicateIncidents.length === 0 ? (
-            <div className="bg-slate-900 p-8 rounded-2xl border border-slate-800 text-center text-slate-400 text-xs">
+            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center text-slate-600 text-xs font-semibold">
               ✓ No active duplicate incidents flagged by AI right now.
             </div>
           ) : (
             <div className="space-y-3">
               {duplicateIncidents.map(inc => (
-                <div key={inc.id} className="bg-slate-900 p-5 rounded-2xl border border-amber-900/60 flex items-center justify-between gap-4">
+                <div key={inc.id} className="bg-white p-5 rounded-3xl border border-amber-200 shadow-sm flex items-center justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-white text-sm">{inc.id}</span>
-                      <span className="bg-amber-950 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-800">
+                      <span className="font-extrabold text-slate-900 text-sm">{inc.id}</span>
+                      <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-300">
                         88% Duplicate Match
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 font-medium mt-1">{inc.district} • {inc.village}</p>
-                    <p className="text-xs text-slate-400 mt-1">{inc.description}</p>
+                    <p className="text-xs text-slate-700 font-bold mt-1">{inc.district} • {inc.village}</p>
+                    <p className="text-xs text-slate-600 mt-1 font-medium">{inc.description}</p>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => showToast(`Merged duplicate report ${inc.id} into primary incident!`)}
-                      className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs"
+                      className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-3 py-1.5 rounded-xl text-xs shadow-xs"
                     >
                       Merge Duplicate
                     </button>
                     <button
                       onClick={() => showToast(`Approved report ${inc.id} as unique emergency!`)}
-                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-3 py-1.5 rounded-lg text-xs"
+                      className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs border border-slate-200"
                     >
                       Dismiss Flag
                     </button>
@@ -156,15 +156,15 @@ export const AdminDashboard: React.FC = () => {
         <div className="space-y-4">
           <div className="space-y-3">
             {volunteers.map(v => (
-              <div key={v.id} className="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
+              <div key={v.id} className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
-                  <h4 className="font-bold text-white text-sm">{v.name}</h4>
-                  <p className="text-xs text-slate-400">{v.district} • Skills: {v.skills.join(', ')}</p>
+                  <h4 className="font-bold text-slate-900 text-sm">{v.name}</h4>
+                  <p className="text-xs text-slate-600 font-medium">{v.district} • Skills: {v.skills.join(', ')}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleApproveVolunteer(v.id)}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs"
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-xl text-xs shadow-xs"
                   >
                     Approve Badge
                   </button>
@@ -182,16 +182,16 @@ export const AdminDashboard: React.FC = () => {
             const incCount = incidents.filter(inc => inc.district === dist).length;
             const campCount = camps.filter(c => c.district === dist).length;
             return (
-              <div key={dist} className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-2">
+              <div key={dist} className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm space-y-2">
                 <div className="flex justify-between items-center">
-                  <h4 className="font-bold text-white text-xs">{dist}</h4>
-                  <span className="text-[10px] bg-red-950 text-red-400 px-2 py-0.5 rounded font-bold">
+                  <h4 className="font-bold text-slate-900 text-xs">{dist}</h4>
+                  <span className="text-[10px] bg-rose-100 text-rose-700 px-2 py-0.5 rounded font-bold border border-rose-300">
                     {incCount} Incidents
                   </span>
                 </div>
-                <div className="text-[11px] text-slate-400 flex justify-between pt-1 border-t border-slate-800">
+                <div className="text-[11px] text-slate-600 flex justify-between pt-1 border-t border-slate-100 font-medium">
                   <span>Relief Camps: <strong>{campCount} Open</strong></span>
-                  <span className="text-emerald-400 font-semibold">Triage Active</span>
+                  <span className="text-emerald-700 font-bold">Triage Active</span>
                 </div>
               </div>
             );

@@ -25,7 +25,7 @@ const MainContent: React.FC = () => {
   const { activeTab, toastMessage } = useApp();
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-red-500 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-pink-400 selection:text-white">
       {/* Header Bar */}
       <Header />
 
