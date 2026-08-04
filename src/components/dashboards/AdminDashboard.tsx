@@ -12,18 +12,20 @@ import {
   Filter, 
   AlertTriangle,
   Radio,
-  FileSpreadsheet
+  FileSpreadsheet,
+  ShieldCheck,
+  Clock
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
-  const { incidents, volunteers, camps, showToast } = useApp();
+  const { incidents, volunteers, camps, verifyVolunteer, showToast } = useApp();
 
   const [activeTab, setActiveTab] = useState<'duplicates' | 'volunteers' | 'heatmap'>('duplicates');
 
-  const duplicateIncidents = incidents.filter(i => i.aiDuplicateFlag);
+  const duplicateIncidents = incidents.filter(i => i.isAiDuplicate);
 
   const handleApproveVolunteer = (volId: string) => {
-    showToast(`✅ Approved Volunteer ${volId} for deployment!`);
+    verifyVolunteer(volId);
   };
 
   const handleExportStatewideReport = () => {
@@ -52,8 +54,8 @@ export const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header - Amber/Pink Gradient */}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
+      {/* Header */}
       <div className="bg-gradient-to-r from-amber-100 via-pink-50 to-emerald-100 border border-amber-200 p-6 rounded-3xl flex flex-wrap items-center justify-between gap-4 shadow-sm">
         <div>
           <span className="text-xs uppercase font-extrabold text-amber-800 tracking-wider flex items-center gap-1.5">
@@ -91,7 +93,7 @@ export const AdminDashboard: React.FC = () => {
           }`}
         >
           <Users className="w-4 h-4" />
-          Volunteer Approvals ({volunteers.length})
+          Volunteer Approvals ({volunteers.filter(v => !v.isVerified).length} Pending)
         </button>
         <button
           onClick={() => setActiveTab('heatmap')}
@@ -123,7 +125,7 @@ export const AdminDashboard: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <span className="font-extrabold text-slate-900 text-sm">{inc.id}</span>
                       <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-300">
-                        88% Duplicate Match
+                        Geospatial Duplicate Match
                       </span>
                     </div>
                     <p className="text-xs text-slate-700 font-bold mt-1">{inc.district} • {inc.village}</p>
@@ -151,34 +153,71 @@ export const AdminDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 2: VOLUNTEER APPROVALS */}
+      {/* TAB 2: VOLUNTEER CREDENTIAL APPROVALS */}
       {activeTab === 'volunteers' && (
         <div className="space-y-4">
-          <div className="space-y-3">
-            {volunteers.map(v => (
-              <div key={v.id} className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-slate-900 text-sm">{v.name}</h4>
-                  <p className="text-xs text-slate-600 font-medium">{v.district} • Skills: {v.skills.join(', ')}</p>
+          <p className="text-xs text-slate-600 font-medium">
+            Verify volunteer credentials to activate official ASDMA Responder badges for critical dispatch auto-assignment.
+          </p>
+
+          {volunteers.length === 0 ? (
+            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center text-slate-600 text-xs font-semibold">
+              No volunteers registered yet.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {volunteers.map(v => (
+                <div key={v.id} className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-slate-900 text-sm">{v.name}</h4>
+                      {v.isVerified ? (
+                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded border border-emerald-300 flex items-center gap-1">
+                          <ShieldCheck className="w-3 h-3 text-emerald-600" /> ASDMA Verified
+                        </span>
+                      ) : (
+                        <span className="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-300 flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-amber-700" /> Pending Verification
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-600 font-medium mt-1">
+                      📍 {v.district} {v.serviceableArea && `• Area: ${v.serviceableArea}`} • Contact: {v.phone}
+                    </p>
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {v.skills.map(sk => (
+                        <span key={sk} className="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded border border-slate-200">
+                          {sk.replace('_', ' ').toUpperCase()}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {!v.isVerified ? (
+                      <button
+                        onClick={() => handleApproveVolunteer(v.id)}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-4 py-2 rounded-xl text-xs shadow-xs flex items-center gap-1"
+                      >
+                        <ShieldCheck className="w-4 h-4" /> Verify Credential
+                      </button>
+                    ) : (
+                      <span className="text-xs text-emerald-700 font-extrabold bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
+                        ✓ Active Verified Responder
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleApproveVolunteer(v.id)}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-xl text-xs shadow-xs"
-                  >
-                    Approve Badge
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {/* TAB 3: DISTRICT BREAKDOWN */}
       {activeTab === 'heatmap' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {ASSAM_DISTRICTS.slice(0, 12).map((dist, i) => {
+          {ASSAM_DISTRICTS.slice(0, 12).map((dist) => {
             const incCount = incidents.filter(inc => inc.district === dist).length;
             const campCount = camps.filter(c => c.district === dist).length;
             return (

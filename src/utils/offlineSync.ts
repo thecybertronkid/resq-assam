@@ -18,7 +18,7 @@ export function saveSosToOfflineQueue(report: Partial<IncidentReport>): void {
     queue.push({
       ...report,
       id: report.id || `OFFLINE-SOS-${Date.now()}`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     });
     localStorage.setItem(OFFLINE_SOS_KEY, JSON.stringify(queue));
   } catch (err) {

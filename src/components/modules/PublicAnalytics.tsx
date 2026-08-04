@@ -1,11 +1,16 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { ASSAM_DISTRICTS } from '../../utils/mockData';
 import { AXOM_RELIEF_EMERGENCY_DATA } from '../../utils/asdmaSyncEngine';
 import { BarChart3, Activity, ShieldCheck, Heart, Users, LifeBuoy, Clock, ExternalLink, Phone, Wifi, Radio } from 'lucide-react';
 
 export const PublicAnalytics: React.FC = () => {
   const { incidents, camps, volunteers, donations, telemetry } = useApp();
+
+  const totalDonated = donations.reduce((sum, d) => sum + (d.amount || 0), 0);
+  const activeIncidentsCount = incidents.filter(i => i.status !== 'completed').length;
+  const completedRescuesCount = incidents.filter(i => i.status === 'completed').length;
+  const verifiedVolunteersCount = volunteers.filter(v => v.isVerified).length;
+  const totalCampOccupancy = camps.reduce((sum, c) => sum + c.currentOccupancy, 0);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
@@ -36,7 +41,7 @@ export const PublicAnalytics: React.FC = () => {
         </a>
       </div>
 
-      {/* Top 4 Key Metric Cards */}
+      {/* Top 4 Key Dynamic Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-3xl border border-emerald-200 shadow-sm space-y-1">
           <span className="text-xs text-slate-500 font-bold block">Statewide Affected Population</span>
@@ -45,21 +50,21 @@ export const PublicAnalytics: React.FC = () => {
         </div>
 
         <div className="bg-white p-5 rounded-3xl border border-sky-200 shadow-sm space-y-1">
-          <span className="text-xs text-slate-500 font-bold block">Avg NDRF Response Time</span>
-          <div className="text-3xl font-heading font-extrabold text-sky-700">14 Mins</div>
-          <span className="text-[11px] text-sky-700 font-bold">Down from 45 mins baseline</span>
+          <span className="text-xs text-slate-500 font-bold block">Active Incidents / Rescues</span>
+          <div className="text-3xl font-heading font-extrabold text-sky-700">{activeIncidentsCount} / {completedRescuesCount} Done</div>
+          <span className="text-[11px] text-sky-700 font-bold">{verifiedVolunteersCount} Verified Volunteers Active</span>
         </div>
 
         <div className="bg-white p-5 rounded-3xl border border-purple-200 shadow-sm space-y-1">
-          <span className="text-xs text-slate-500 font-bold block">Relief Ration Distributed</span>
-          <div className="text-3xl font-heading font-extrabold text-purple-700">28,400 Packs</div>
-          <span className="text-[11px] text-purple-700 font-bold">Food, Water & Medicines</span>
+          <span className="text-xs text-slate-500 font-bold block">Relief Camp Occupancy</span>
+          <div className="text-3xl font-heading font-extrabold text-purple-700">{totalCampOccupancy} People</div>
+          <span className="text-[11px] text-purple-700 font-bold">Across {camps.length} Registered Camps</span>
         </div>
 
         <div className="bg-white p-5 rounded-3xl border border-pink-200 shadow-sm space-y-1">
-          <span className="text-xs text-slate-500 font-bold block">Total Donated Funds</span>
-          <div className="text-3xl font-heading font-extrabold text-pink-700">₹45.2 Lakhs</div>
-          <span className="text-[11px] text-pink-700 font-bold">Audited & Receipts Issued</span>
+          <span className="text-xs text-slate-500 font-bold block">Total Donated Relief Funds</span>
+          <div className="text-3xl font-heading font-extrabold text-pink-700">₹{totalDonated.toLocaleString()}</div>
+          <span className="text-[11px] text-pink-700 font-bold">Audited & 80G Receipts Issued</span>
         </div>
       </div>
 

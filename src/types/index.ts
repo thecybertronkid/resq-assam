@@ -1,16 +1,8 @@
-export type UserRole = 'citizen' | 'volunteer' | 'ngo' | 'rescue' | 'admin';
+export type UserRole = 'citizen' | 'rescue' | 'volunteer' | 'ngo' | 'admin';
 
-export type DisasterType = 'flood' | 'landslide' | 'storm' | 'erosion' | 'earthquake';
-
+export type DisasterType = 'flood' | 'landslide' | 'erosion' | 'storm' | 'earthquake' | 'other';
 export type IncidentSeverity = 'critical' | 'high' | 'medium' | 'low';
-
-export type IncidentStatus = 
-  | 'pending' 
-  | 'accepted' 
-  | 'en_route' 
-  | 'rescuing' 
-  | 'completed' 
-  | 'unable';
+export type IncidentStatus = 'submitted' | 'verified' | 'accepted' | 'en_route' | 'rescuing' | 'completed' | 'cancelled';
 
 export interface Demographics {
   adults: number;
@@ -42,17 +34,16 @@ export interface IncidentReport {
     livestock: boolean;
   };
   description: string;
-  photos: string[];
-  videos?: string[];
   voiceNoteUrl?: string;
-  timestamp: string;
+  photos: string[];
   status: IncidentStatus;
+  aiVulnerabilityScore: number; // 1 - 100
+  isAiDuplicate?: boolean;
+  duplicateMatchedId?: string;
+  createdAt: string;
   assignedTeamId?: string;
   assignedTeamName?: string;
-  aiDuplicateFlag?: boolean;
-  aiVulnerabilityScore: number; // 1 to 100
-  rescueNotes?: string;
-  rescuePhoto?: string;
+  rescuePhotoProof?: string;
 }
 
 export interface ReliefCamp {
@@ -63,15 +54,14 @@ export interface ReliefCamp {
   lng: number;
   capacity: number;
   currentOccupancy: number;
-  food: boolean;
-  water: boolean;
-  medical: boolean;
-  toilets: boolean;
-  charging: boolean;
-  womenFriendly: boolean;
-  childFriendly: boolean;
-  petFriendly: boolean;
   contactPhone: string;
+  amenities: {
+    foodWater: boolean;
+    medicalBay: boolean;
+    womenChildSafe: boolean;
+    petFriendly: boolean;
+    powerBackup: boolean;
+  };
   inCharge: string;
 }
 
@@ -81,6 +71,7 @@ export interface Volunteer {
   phone: string;
   email: string;
   district: string;
+  serviceableArea?: string;
   skills: ('swimmer' | 'doctor' | 'nurse' | 'boat_operator' | 'driver' | 'drone_pilot' | 'animal_rescue' | 'logistics')[];
   available: boolean;
   isVerified: boolean;
@@ -132,6 +123,13 @@ export interface RoadReport {
   details: string;
   reportedAt: string;
   reportedBy: string;
+  photoUrl?: string;
+  telemetrics?: {
+    waterDepthFeet: number;
+    waterDepthMeters: number;
+    obstacleType: string;
+    structuralRiskScore: number;
+  };
 }
 
 export interface DisasterAlert {
@@ -158,5 +156,4 @@ export interface Donation {
   district: string;
   timestamp: string;
   receiptNo: string;
-  paymentMethod: string;
 }

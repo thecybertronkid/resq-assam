@@ -400,7 +400,7 @@ export const LiveIncidentMap: React.FC = () => {
                     <div className="bg-emerald-50 p-2 rounded-xl border border-emerald-200 text-emerald-800">✓ Food & Water</div>
                     <div className="bg-emerald-50 p-2 rounded-xl border border-emerald-200 text-emerald-800">✓ Medical Bay</div>
                     <div className="bg-pink-50 p-2 rounded-xl border border-pink-200 text-pink-800">✓ Women/Child Safe</div>
-                    <div className="bg-purple-50 p-2 rounded-xl border border-purple-200 text-purple-800">{camp.petFriendly ? '✓ Pet Shelter' : '✕ No Pets'}</div>
+                    <div className="bg-purple-50 p-2 rounded-xl border border-purple-200 text-purple-800">{camp.amenities?.petFriendly ? '✓ Pet Shelter' : '✕ No Pets'}</div>
                   </div>
                 </div>
               );

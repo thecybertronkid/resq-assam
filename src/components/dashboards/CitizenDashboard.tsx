@@ -86,7 +86,7 @@ export const CitizenDashboard: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span className="font-extrabold text-slate-900 text-base">{inc.id}</span>
                         <span className={`badge-${inc.severity}`}>{inc.severity.toUpperCase()}</span>
-                        <span className="text-xs text-slate-500">• {inc.timestamp}</span>
+                        <span className="text-xs text-slate-500">• {inc.createdAt}</span>
                       </div>
                       <p className="text-xs text-slate-700 font-semibold mt-1">{inc.village} ({inc.landmark})</p>
                     </div>

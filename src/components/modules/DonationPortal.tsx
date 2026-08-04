@@ -5,7 +5,7 @@ import { Heart, CreditCard, Package, CheckCircle, Download, Sparkles, FileText }
 import confetti from 'canvas-confetti';
 
 export const DonationPortal: React.FC = () => {
-  const { makeDonation, donations } = useApp();
+  const { addDonation, donations } = useApp();
 
   const [donorType, setDonorType] = useState<'money' | 'goods'>('money');
   const [donorName, setDonorName] = useState('');
@@ -33,7 +33,7 @@ export const DonationPortal: React.FC = () => {
       paymentMethod: donorType === 'money' ? 'UPI / NetBanking' : 'In-Kind Logistics Drop'
     };
 
-    makeDonation(donPayload);
+    addDonation(donPayload);
 
     try {
       confetti({
