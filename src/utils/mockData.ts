@@ -1,37 +1,10 @@
 import { IncidentReport, ReliefCamp, Volunteer, NGOInventory, MissingPerson, RoadReport, DisasterAlert, Donation } from '../types';
 
 export const ASSAM_DISTRICTS = [
-  'Kamrup Metropolitan',
-  'Kamrup Rural',
-  'Cachar',
-  'Dibrugarh',
-  'Jorhat',
-  'Lakhimpur',
-  'Dhemaji',
-  'Barpeta',
-  'Nagaon',
-  'Morigaon',
-  'Tinsukia',
-  'Golaghat',
-  'Sonitpur',
-  'Nalbari',
-  'Chirang',
-  'Dhubri',
-  'Karimganj',
-  'Hailakandi',
-  'Bongaigaon',
   'Sivasagar',
-  'Goalpara',
-  'Baksa',
-  'Udalguri',
-  'Darrang',
-  'Biswanath',
-  'Hojai',
-  'Majuli',
-  'South Salmara-Mankachar',
-  'West Karbi Anglong',
-  'Karbi Anglong',
-  'Dima Hasao'
+  'Charaideo',
+  'Jorhat',
+  'Golaghat'
 ];
 
 export const INITIAL_INCIDENTS: IncidentReport[] = [];

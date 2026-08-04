@@ -19,7 +19,7 @@ export const NgoDashboard: React.FC = () => {
   const defaultNgo: NGOInventory = {
     id: 'NGO-DEFAULT',
     ngoName: 'ResQ Assam State Central Relief Warehouse',
-    district: 'Kamrup Metropolitan',
+    district: 'Sivasagar',
     contactPhone: '+91 361 2237011',
     items: {
       foodPacks: 12000,

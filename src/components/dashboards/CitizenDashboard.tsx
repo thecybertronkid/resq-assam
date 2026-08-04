@@ -18,7 +18,7 @@ import {
 export const CitizenDashboard: React.FC = () => {
   const { incidents, camps, roadReports, setIsSosModalOpen, showToast } = useApp();
 
-  const [selectedDistrictFilter, setSelectedDistrictFilter] = useState('Kamrup Metropolitan');
+  const [selectedDistrictFilter, setSelectedDistrictFilter] = useState('Sivasagar');
   const [supplyRequest, setSupplyRequest] = useState('');
 
   const myIncidents = incidents.filter(i => i.district === selectedDistrictFilter || i.reporterName.includes('Biren') || i.reporterName.includes('Sunita'));

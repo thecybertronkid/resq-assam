@@ -107,7 +107,7 @@ export const AiAssistantDrawer: React.FC = () => {
         aiResponseText = `📞 State Disaster Control Room Helplines:\n• State Control Room: 1070 / 1077\n• Axom Relief Emergency Dispatch: +91 361 2237011\n• NDRF 1st Bn Patgaon: +91 361 2840140\n• Medical Ambulance: 108`;
       } else if (lower.includes('river') || lower.includes('water') || lower.includes('level')) {
         const gauges = telemetry.activeRiverGauges.map(g => `${g.station}: ${g.waterLevelMeter}m (${g.trend})`).join('\n• ');
-        aiResponseText = `🌊 Live River Level Telemetry (CWC / State Stream):\n• ${gauges}\n\nBrahmaputra in Guwahati is currently flowing 0.44m above danger level.`;
+        aiResponseText = `🌊 Live River Level Telemetry (CWC / State Stream):\n• ${gauges}\n\nNematighat (Jorhat) is currently flowing 0.88m above danger level. Dikhow River at Sivasagar also showing rising trend.`;
       } else {
         aiResponseText = `🤖 I have logged your query into the disaster telemetry engine. If you are stranded or need urgent food/water, use the SOS button to pin your GPS location directly to NDRF commanders.`;
       }

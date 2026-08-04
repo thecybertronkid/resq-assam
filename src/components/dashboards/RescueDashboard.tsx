@@ -194,7 +194,7 @@ export const RescueDashboard: React.FC = () => {
                         </option>
                       ))}
                       <option value="NDRF 1st Bn Patgaon Deep Motorboat Squad">🚤 NDRF 1st Bn Patgaon Deep Motorboat Squad</option>
-                      <option value="SDRF Guwahati Aquatic Rescue Flight 2">🚁 SDRF Guwahati Aquatic Rescue Flight 2</option>
+                      <option value="SDRF Jorhat Aquatic Rescue Unit">🚣 SDRF Jorhat Aquatic Rescue Unit</option>
                     </select>
                   ) : (
                     <div className="space-y-2">
@@ -207,8 +207,8 @@ export const RescueDashboard: React.FC = () => {
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-bold text-xs"
                       >
                         <option value="NDRF 1st Bn Patgaon Deep Motorboat Squad">🚤 NDRF 1st Bn Patgaon Deep Motorboat Squad</option>
-                        <option value="SDRF Guwahati Aquatic Rescue Flight 2">🚁 SDRF Guwahati Aquatic Rescue Flight 2</option>
-                        <option value="Indian Army Eastern Command Amphibious Force">🎖️ Indian Army Eastern Command Amphibious Force</option>
+                        <option value="SDRF Jorhat Aquatic Rescue Unit">🚣 SDRF Jorhat Aquatic Rescue Unit</option>
+                        <option value="SDRF Sivasagar Flood Response Team">🚣 SDRF Sivasagar Flood Response Team</option>
                       </select>
                     </div>
                   )}

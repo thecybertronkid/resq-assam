@@ -110,28 +110,27 @@ export const LandingPage: React.FC = () => {
                 </span>
               </div>
 
-              {/* Animated Gauges */}
               <div className="space-y-3">
                 <div className="bg-slate-50/90 p-3.5 rounded-2xl border border-slate-200/80 space-y-2">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold text-slate-800">Guwahati Station (Brahmaputra)</span>
-                    <span className="font-extrabold text-rose-600">49.80 m (Rising)</span>
+                    <span className="font-bold text-slate-800">Nematighat Station (Jorhat)</span>
+                    <span className="font-extrabold text-rose-600">86.42 m (Rising)</span>
                   </div>
                   <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-                    <div className="bg-gradient-to-r from-rose-500 to-pink-600 h-full w-[88%] rounded-full animate-pulse"></div>
+                    <div className="bg-gradient-to-r from-rose-500 to-pink-600 h-full w-[85%] rounded-full animate-pulse"></div>
                   </div>
-                  <span className="text-[10px] text-slate-500 font-bold block">Danger Mark: 49.68 m (0.12m above danger level)</span>
+                  <span className="text-[10px] text-slate-500 font-bold block">Danger Mark: 85.54 m (0.88m above danger level)</span>
                 </div>
 
                 <div className="bg-slate-50/90 p-3.5 rounded-2xl border border-slate-200/80 space-y-2">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold text-slate-800">Nematighat Station (Jorhat)</span>
-                    <span className="font-extrabold text-amber-600">86.20 m (Stable)</span>
+                    <span className="font-bold text-slate-800">Sivasagar (Dikhow River)</span>
+                    <span className="font-extrabold text-amber-600">74.15 m (Rising)</span>
                   </div>
                   <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-                    <div className="bg-amber-500 h-full w-[72%] rounded-full"></div>
+                    <div className="bg-amber-500 h-full w-[74%] rounded-full"></div>
                   </div>
-                  <span className="text-[10px] text-slate-500 font-bold block">Danger Mark: 85.54 m</span>
+                  <span className="text-[10px] text-slate-500 font-bold block">Danger Mark: 73.80 m (0.35m above danger level)</span>
                 </div>
               </div>
 

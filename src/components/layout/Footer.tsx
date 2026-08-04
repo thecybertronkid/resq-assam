@@ -65,7 +65,7 @@ export const Footer: React.FC = () => {
                 <a href="tel:03612840284" className="text-sky-700 font-bold hover:underline bg-sky-50 px-2 py-0.5 rounded border border-sky-200">0361-2840284</a>
               </li>
               <li className="flex items-center justify-between bg-white p-2 rounded-xl border border-slate-200/80">
-                <span className="text-slate-700 text-[11px]">SDRF Guwahati Control:</span>
+                <span className="text-slate-700 text-[11px]">SDRF Jorhat Control:</span>
                 <a href="tel:9435010000" className="text-sky-700 font-bold hover:underline bg-sky-50 px-2 py-0.5 rounded border border-sky-200">94350 10000</a>
               </li>
               <li className="flex items-center justify-between bg-white p-2 rounded-xl border border-slate-200/80">

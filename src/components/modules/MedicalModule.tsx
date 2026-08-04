@@ -8,45 +8,45 @@ export const MedicalModule: React.FC = () => {
   const [hospitals, setHospitals] = useState([
     {
       id: 'HOSP-1',
-      name: 'Gauhati Medical College & Hospital (GMCH)',
-      district: 'Kamrup Metropolitan',
-      phone: '0361 2529457',
-      icuBeds: 45,
-      bloodStock: 'A+, O+, B+, AB+ Available',
-      ambulanceUnit: '108 Boat Ambulance 4 Units Active'
-    },
-    {
-      id: 'HOSP-2',
-      name: 'Assam Medical College & Hospital (AMCH)',
-      district: 'Dibrugarh',
-      phone: '0373 2300080',
-      icuBeds: 28,
-      bloodStock: 'O-, A+, B+ Stocked',
-      ambulanceUnit: 'Water Trauma Unit 2'
-    },
-    {
-      id: 'HOSP-3',
-      name: 'Silchar Medical College & Hospital (SMCH)',
-      district: 'Cachar',
-      phone: '03842 240294',
-      icuBeds: 20,
-      bloodStock: 'Emergency Blood Bank 24x7',
-      ambulanceUnit: 'Flood Disaster Ambulance Flight 1'
-    },
-    {
-      id: 'HOSP-4',
       name: 'Jorhat Medical College & Hospital (JMCH)',
       district: 'Jorhat',
       phone: '0376 2370012',
       icuBeds: 18,
       bloodStock: 'Platelets & Plasma Ready',
+      ambulanceUnit: '108 Water Ambulance Unit'
+    },
+    {
+      id: 'HOSP-2',
+      name: 'Sivasagar Civil Hospital',
+      district: 'Sivasagar',
+      phone: '03772 222501',
+      icuBeds: 10,
+      bloodStock: 'O+, A+ Stocked',
+      ambulanceUnit: '108 Road & Flood Boat Unit'
+    },
+    {
+      id: 'HOSP-3',
+      name: 'Golaghat Civil Hospital',
+      district: 'Golaghat',
+      phone: '03774 220087',
+      icuBeds: 8,
+      bloodStock: 'Emergency Blood Bank Available',
+      ambulanceUnit: '108 Flood Ambulance Unit'
+    },
+    {
+      id: 'HOSP-4',
+      name: 'Charaideo District Hospital',
+      district: 'Charaideo',
+      phone: '03771 260100',
+      icuBeds: 6,
+      bloodStock: 'O+, B+ Available',
       ambulanceUnit: '108 Road Unit'
     }
   ]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState('');
-  const [district, setDistrict] = useState('Kamrup Metropolitan');
+  const [district, setDistrict] = useState('Sivasagar');
   const [phone, setPhone] = useState('+91 361 200000');
   const [icuBeds, setIcuBeds] = useState(15);
   const [bloodStock, setBloodStock] = useState('O+, A+ Stocked');

@@ -25,19 +25,16 @@ export const AXOM_RELIEF_EMERGENCY_DATA = {
     { label: "Assam 108 Emergency Ambulance", phone: "108" }
   ],
   verifiedDistrictsCovered: [
-    "Kamrup Metropolitan", "Dibrugarh", "Cachar", "Barpeta", 
-    "Darrang", "Dhemaji", "Dhubri", "Jorhat", "Lakhimpur", 
-    "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "Tinsukia"
+    "Sivasagar", "Charaideo", "Jorhat", "Golaghat"
   ]
 };
 
 // Initial live river telemetry gauges
 export const INITIAL_RIVER_GAUGES = [
-  { station: 'Guwahati (Brahmaputra)', waterLevelMeter: 50.12, dangerLevelMeter: 49.68, trend: 'RISING' as const },
-  { station: 'Dibrugarh (Brahmaputra)', waterLevelMeter: 106.10, dangerLevelMeter: 105.70, trend: 'RISING' as const },
-  { station: 'Silchar (Barak River)', waterLevelMeter: 20.35, dangerLevelMeter: 19.83, trend: 'STABLE' as const },
   { station: 'Nematighat (Jorhat)', waterLevelMeter: 86.42, dangerLevelMeter: 85.54, trend: 'RISING' as const },
-  { station: 'Tezpur (Sonitpur)', waterLevelMeter: 65.80, dangerLevelMeter: 65.23, trend: 'FALLING' as const }
+  { station: 'Sivasagar (Dikhow River)', waterLevelMeter: 74.15, dangerLevelMeter: 73.80, trend: 'RISING' as const },
+  { station: 'Golaghat (Dhansiri River)', waterLevelMeter: 61.30, dangerLevelMeter: 60.88, trend: 'STABLE' as const },
+  { station: 'Charaideo (Disang River)', waterLevelMeter: 68.55, dangerLevelMeter: 68.20, trend: 'RISING' as const }
 ];
 
 // Live State Disaster Sync Simulator

@@ -147,7 +147,7 @@ export const ReliefCampsModule: React.FC = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Guwahati High School Shelter"
+                  placeholder="e.g. Sivasagar Town High School Shelter"
                   value={name}
                   onChange={e => setName(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium"
