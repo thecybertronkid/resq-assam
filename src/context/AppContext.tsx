@@ -59,6 +59,7 @@ interface AppContextType {
   updateCampOccupancy: (campId: string, occupancy: number) => void;
   addVolunteer: (vol: Omit<Volunteer, 'id' | 'isVerified' | 'tasksAssigned'>) => void;
   verifyVolunteer: (volId: string) => void;
+  updateVolunteerLocation: (volId: string, lat: number, lng: number) => void;
   addNGO: (ngo: NGOInventory) => void;
   updateNgoStock: (ngoId: string, itemKey: keyof NGOInventory['items'], quantity: number) => void;
   addMissingPerson: (person: Omit<MissingPerson, 'id'>) => void;
@@ -303,6 +304,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`✅ Admin verified volunteer credential for ${volId}! Saved to Supabase database.`);
   };
 
+  const updateVolunteerLocation = (volId: string, lat: number, lng: number) => {
+    setVolunteers(prev => prev.map(v => {
+      if (v.id === volId) {
+        const updated = { ...v, lat, lng };
+        dbService.saveVolunteer(updated);
+        supabaseClient.syncVolunteer(updated);
+        return updated;
+      }
+      return v;
+    }));
+    showToast(`📍 Live Responder GPS updated to (${lat.toFixed(4)}, ${lng.toFixed(4)})! Plotted on Live Map.`);
+  };
+
   const addNGO = (ngo: NGOInventory) => {
     setNgos(prev => [ngo, ...prev]);
     dbService.saveNGO(ngo);
@@ -395,6 +409,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateCampOccupancy,
         addVolunteer,
         verifyVolunteer,
+        updateVolunteerLocation,
         addNGO,
         updateNgoStock,
         addMissingPerson,

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useApp } from '../../context/AppContext';
-import { IncidentReport, ReliefCamp, RoadReport } from '../../types';
+import { IncidentReport, ReliefCamp, RoadReport, Volunteer } from '../../types';
 import { 
   Filter, 
   MapPin, 
@@ -25,14 +25,14 @@ import {
 } from 'lucide-react';
 
 export const LiveIncidentMap: React.FC = () => {
-  const { incidents, camps, roadReports, setIsSosModalOpen, role, setActiveTab, showToast } = useApp();
+  const { incidents, camps, roadReports, volunteers, setIsSosModalOpen, role, setActiveTab, showToast } = useApp();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
 
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedItem, setSelectedItem] = useState<{ type: 'incident' | 'camp' | 'road'; data: any } | null>(null);
+  const [selectedItem, setSelectedItem] = useState<{ type: 'incident' | 'camp' | 'road' | 'volunteer'; data: any } | null>(null);
   const [showCtrlHint, setShowCtrlHint] = useState(false);
 
   // Initialize Leaflet map centered on Assam
@@ -173,7 +173,20 @@ export const LiveIncidentMap: React.FC = () => {
         marker.on('click', () => setSelectedItem({ type: 'road', data: road }));
       });
     }
-  }, [incidents, camps, roadReports, selectedFilter, selectedDistrict, searchQuery]);
+
+    // Filtered Rescuers / Verified Volunteers
+    if (selectedFilter === 'all' || selectedFilter === 'rescuers') {
+      volunteers.forEach(vol => {
+        if (!vol.lat || !vol.lng) return;
+        if (selectedDistrict !== 'all' && vol.district !== selectedDistrict) return;
+        if (searchQuery && !vol.name.toLowerCase().includes(searchQuery.toLowerCase()) && !vol.district.toLowerCase().includes(searchQuery.toLowerCase())) return;
+
+        const icon = createCustomIcon('#059669', '🦺');
+        const marker = L.marker([vol.lat, vol.lng], { icon }).addTo(map);
+        marker.on('click', () => setSelectedItem({ type: 'volunteer', data: vol }));
+      });
+    }
+  }, [incidents, camps, roadReports, volunteers, selectedFilter, selectedDistrict, searchQuery]);
 
   return (
     <div className="relative w-full h-[calc(100vh-5.5rem)] min-h-[500px] flex flex-col md:flex-row overflow-hidden bg-slate-50">
@@ -197,6 +210,7 @@ export const LiveIncidentMap: React.FC = () => {
             {[
               { id: 'all', label: 'All Items' },
               { id: 'sos', label: '🆘 SOS' },
+              { id: 'rescuers', label: '🦺 Rescuers' },
               { id: 'camps', label: '⛺ Camps' },
               { id: 'roads', label: '🚧 Roads' }
             ].map(f => (
@@ -401,6 +415,56 @@ export const LiveIncidentMap: React.FC = () => {
                     <div className="bg-emerald-50 p-2 rounded-xl border border-emerald-200 text-emerald-800">✓ Medical Bay</div>
                     <div className="bg-pink-50 p-2 rounded-xl border border-pink-200 text-pink-800">✓ Women/Child Safe</div>
                     <div className="bg-purple-50 p-2 rounded-xl border border-purple-200 text-purple-800">{camp.amenities?.petFriendly ? '✓ Pet Shelter' : '✕ No Pets'}</div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* VOLUNTEER RESCUER DETAILS */}
+            {selectedItem.type === 'volunteer' && (() => {
+              const vol: Volunteer = selectedItem.data;
+              return (
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base font-bold text-slate-900">{vol.name}</h3>
+                        {vol.isVerified && (
+                          <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded border border-emerald-300">
+                            ✓ Verified Rescuer
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 font-medium">📍 {vol.district} District</p>
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${vol.available ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500'}`}>
+                      {vol.available ? '🟢 On-Duty' : 'Off-Duty'}
+                    </span>
+                  </div>
+
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1 text-xs">
+                    <span className="text-[10px] text-slate-500 font-bold block uppercase">Serviceable Location Area:</span>
+                    <p className="text-slate-900 font-bold">{vol.serviceableArea || `${vol.district} Sector`}</p>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] text-slate-500 font-bold block uppercase mb-1.5">Certified Rescue Skills:</span>
+                    <div className="flex flex-wrap gap-1">
+                      {vol.skills.map((sk: string) => (
+                        <span key={sk} className="bg-emerald-50 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-200">
+                          ✓ {sk.replace('_', ' ').toUpperCase()}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-1">
+                    <a
+                      href={`tel:${vol.phone}`}
+                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"
+                    >
+                      📞 Call Rescuer Direct: {vol.phone}
+                    </a>
                   </div>
                 </div>
               );
