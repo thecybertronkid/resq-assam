@@ -129,6 +129,9 @@ export interface RoadReport {
     waterDepthMeters: number;
     obstacleType: string;
     structuralRiskScore: number;
+    recommendedEquipment?: string;
+    confidence?: number;
+    submersionSeverity?: string;
   };
 }
 
