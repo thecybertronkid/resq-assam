@@ -28,7 +28,7 @@ export const AuthModal: React.FC = () => {
       desc: 'Access private volunteer portal, accept field tasks, update live GPS telemetry', 
       icon: '🦺',
       requiresPass: true,
-      demoHint: 'Demo Login: vol_biren / vol123 (or sign up below)'
+      demoHint: 'Use your Volunteer ID (e.g. VOL-SIVA-0001) & Password'
     },
     { 
       id: 'ngo', 

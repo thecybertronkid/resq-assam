@@ -533,8 +533,6 @@ export const VolunteerDashboard: React.FC = () => {
                 <Key className="w-4 h-4 text-emerald-600" /> Credentials to Access Portal:
               </div>
               <div>• <strong>Registered Volunteer:</strong> Use your auto-generated ID (e.g. <code>VOL-SIVA-0001</code>) & Password</div>
-              {/* <div>• <strong>NDRF Rescue Passcode:</strong> <code>ndrf2026</code></div> */}
-              {/* <div>• <strong>Admin Master Passcode:</strong> <code>admin123</code></div> */}
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
