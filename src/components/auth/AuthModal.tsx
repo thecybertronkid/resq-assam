@@ -40,7 +40,7 @@ export const AuthModal: React.FC = () => {
     },
     { 
       id: 'rescue', 
-      title: 'NDRF / SDRF Rescue Commander', 
+      title: 'Rescue Commanders', 
       desc: 'Monitor all roles, accept tactical missions, assign boat/heli units', 
       icon: '🚁',
       requiresPass: true,
@@ -48,7 +48,7 @@ export const AuthModal: React.FC = () => {
     },
     { 
       id: 'admin', 
-      title: 'Govt / Admin', 
+      title: 'Admin War Room', 
       desc: 'Statewide command, AI duplicate moderation, volunteer approvals, CSV exports', 
       icon: '🏛️',
       requiresPass: true,

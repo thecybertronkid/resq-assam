@@ -92,7 +92,7 @@ export const Header: React.FC = () => {
       ctaAction: () => { setActiveTab('ngo'); showToast('📦 NGO Relief Supply Warehouse Form Opened!'); }
     },
     rescue: { 
-      title: 'Rescue Command', 
+      title: 'Rescue Commanders', 
       dashLabel: 'Tactical Triage',
       dashTab: 'rescue',
       badgeColor: 'bg-rose-50 text-rose-700 border-rose-200',
@@ -101,7 +101,7 @@ export const Header: React.FC = () => {
       ctaAction: () => { setActiveTab('rescue'); showToast('🚁 Tactical Rescue Command Queue Opened!'); }
     },
     admin: { 
-      title: 'Govt Admin', 
+      title: 'Admin War Room', 
       dashLabel: 'Admin Command Center',
       dashTab: 'admin',
       badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
