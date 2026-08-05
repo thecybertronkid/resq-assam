@@ -46,6 +46,7 @@ export const Header: React.FC = () => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
+  const [showLogoutConfirmModal, setShowLogoutConfirmModal] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -304,7 +305,7 @@ export const Header: React.FC = () => {
             {/* Role Switcher & Auth Pill */}
             {authenticatedRole !== 'citizen' ? (
               <button
-                onClick={logoutRole}
+                onClick={() => setShowLogoutConfirmModal(true)}
                 className="hidden sm:flex px-2.5 py-1.5 rounded-xl text-xs font-extrabold border bg-rose-50 text-rose-800 border-rose-300 items-center gap-1.5 transition-all hover:bg-rose-100 shadow-2xs"
                 title="Log Out Session & Return to Citizen Mode"
               >
@@ -455,6 +456,56 @@ export const Header: React.FC = () => {
             <Sparkles className="w-4 h-4 text-sky-600" />
             Open ResQ AI Emergency Copilot
           </button>
+        </div>
+      )}
+
+      {/* LOGOUT CONFIRMATION MODAL */}
+      {showLogoutConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md overflow-y-auto">
+          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 animate-in fade-in zoom-in-95 my-6">
+            <div className="flex items-center justify-between border-b border-rose-100 pb-3">
+              <div className="flex items-center gap-2.5 text-rose-600">
+                <div className="w-9 h-9 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center font-bold text-lg">
+                  🔒
+                </div>
+                <div>
+                  <h3 className="font-heading font-extrabold text-slate-900 text-base">Confirm Session Logout</h3>
+                  <p className="text-[11px] text-slate-500 font-medium">Switch session back to Public Citizen Mode</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowLogoutConfirmModal(false)}
+                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-700 font-medium leading-relaxed bg-rose-50/70 p-3.5 rounded-2xl border border-rose-200">
+              Are you sure you want to log out of your <strong>{currentRoleCfg.title}</strong> session? You will lose active session controls and return to Public Citizen Mode.
+            </p>
+
+            <div className="flex gap-2.5 pt-2 text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirmModal(false)}
+                className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  logoutRole();
+                  setShowLogoutConfirmModal(false);
+                }}
+                className="flex-1 bg-rose-600 hover:bg-rose-500 text-white py-3 rounded-xl shadow-md shadow-rose-600/20 flex items-center justify-center gap-1.5 transition-all"
+              >
+                <UserCheck className="w-4 h-4" />
+                <span>Confirm Logout</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </header>
