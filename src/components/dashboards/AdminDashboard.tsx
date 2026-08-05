@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ASSAM_DISTRICTS } from '../../utils/mockData';
-import { Volunteer, IncidentReport, ReliefCamp, NGOInventory } from '../../types';
+import { Volunteer, IncidentReport, ReliefCamp, NGOInventory, MissingPerson, RoadReport } from '../../types';
 import { 
   ShieldAlert, 
   Sparkles, 
@@ -31,7 +31,10 @@ import {
   RefreshCcw,
   Check,
   Plus,
-  CheckSquare
+  CheckSquare,
+  Compass,
+  Navigation,
+  ExternalLink
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
@@ -49,16 +52,19 @@ export const AdminDashboard: React.FC = () => {
     deleteVolunteer, 
     updateCampOccupancy,
     deleteCamp,
+    updateMissingPersonStatus,
     deleteMissingPerson,
+    updateRoadReportStatus,
     deleteRoadReport,
     resetPlatformData,
     showToast 
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'incidents' | 'volunteers' | 'camps' | 'ngos' | 'heatmap'>('volunteers');
+  const [activeTab, setActiveTab] = useState<'volunteers' | 'incidents' | 'camps' | 'ngos' | 'missing' | 'roads' | 'heatmap'>('volunteers');
 
   // Search & Filters
   const [volunteerSearch, setVolunteerSearch] = useState('');
+  const [missingSearch, setMissingSearch] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('ALL');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<'ALL' | 'VERIFIED' | 'PENDING'>('ALL');
   const [incidentSeverityFilter, setIncidentSeverityFilter] = useState<string>('ALL');
@@ -67,6 +73,8 @@ export const AdminDashboard: React.FC = () => {
   const [volToDelete, setVolToDelete] = useState<Volunteer | null>(null);
   const [incidentToDelete, setIncidentToDelete] = useState<IncidentReport | null>(null);
   const [campToDelete, setCampToDelete] = useState<ReliefCamp | null>(null);
+  const [missingToDelete, setMissingToDelete] = useState<MissingPerson | null>(null);
+  const [roadToDelete, setRoadToDelete] = useState<RoadReport | null>(null);
   const [showResetConfirmModal, setShowResetConfirmModal] = useState(false);
 
   const duplicateIncidents = incidents.filter(i => i.isAiDuplicate);
@@ -97,6 +105,22 @@ export const AdminDashboard: React.FC = () => {
     const matchesDistrict = selectedDistrict === 'ALL' || i.district === selectedDistrict;
     const matchesSeverity = incidentSeverityFilter === 'ALL' || i.severity === incidentSeverityFilter;
     return matchesDistrict && matchesSeverity;
+  });
+
+  // Missing Person filtering
+  const filteredMissing = missingPersons.filter(m => {
+    const matchesSearch = 
+      m.fullName.toLowerCase().includes(missingSearch.toLowerCase()) ||
+      m.lastSeenLocation.toLowerCase().includes(missingSearch.toLowerCase()) ||
+      m.reporterName.toLowerCase().includes(missingSearch.toLowerCase());
+    const matchesDistrict = selectedDistrict === 'ALL' || m.district === selectedDistrict;
+    return matchesSearch && matchesDistrict;
+  });
+
+  // Road Report filtering
+  const filteredRoads = roadReports.filter(r => {
+    const matchesDistrict = selectedDistrict === 'ALL' || r.district === selectedDistrict;
+    return matchesDistrict;
   });
 
   const handleExportStatewideReport = () => {
@@ -134,7 +158,7 @@ export const AdminDashboard: React.FC = () => {
             SUPREME STATE DISASTER COMMAND CENTER • ASSAM
           </span>
           <h1 className="text-2xl font-heading font-extrabold text-slate-900">Supreme Admin War Room</h1>
-          <p className="text-xs text-slate-600 font-medium">Supreme operational control body: Manage dispatches, verify/delete volunteers, audit warehouses & reset live platform data.</p>
+          <p className="text-xs text-slate-600 font-medium">Supreme operational control body: Manage dispatches, verify/delete volunteers, missing persons & road hazards moderation.</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -219,6 +243,26 @@ export const AdminDashboard: React.FC = () => {
         </button>
 
         <button
+          onClick={() => setActiveTab('missing')}
+          className={`pb-3 flex items-center gap-2 whitespace-nowrap transition-all ${
+            activeTab === 'missing' ? 'text-indigo-600 border-b-2 border-indigo-500 font-extrabold text-sm' : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Search className="w-4 h-4" />
+          Missing Persons ({missingPersons.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('roads')}
+          className={`pb-3 flex items-center gap-2 whitespace-nowrap transition-all ${
+            activeTab === 'roads' ? 'text-amber-600 border-b-2 border-amber-500 font-extrabold text-sm' : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Compass className="w-4 h-4" />
+          Road Hazards ({roadReports.length})
+        </button>
+
+        <button
           onClick={() => setActiveTab('camps')}
           className={`pb-3 flex items-center gap-2 whitespace-nowrap transition-all ${
             activeTab === 'camps' ? 'text-purple-600 border-b-2 border-purple-500 font-extrabold text-sm' : 'text-slate-500 hover:text-slate-800'
@@ -241,18 +285,17 @@ export const AdminDashboard: React.FC = () => {
         <button
           onClick={() => setActiveTab('heatmap')}
           className={`pb-3 flex items-center gap-2 whitespace-nowrap transition-all ${
-            activeTab === 'heatmap' ? 'text-amber-600 border-b-2 border-amber-500 font-extrabold text-sm' : 'text-slate-500 hover:text-slate-800'
+            activeTab === 'heatmap' ? 'text-slate-900 border-b-2 border-slate-900 font-extrabold text-sm' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
           <BarChart3 className="w-4 h-4" />
-          District Radar Overview
+          District Radar
         </button>
       </div>
 
       {/* TAB 1: VOLUNTEER MANAGEMENT & DELETION */}
       {activeTab === 'volunteers' && (
         <div className="space-y-6">
-          {/* Filters & Search Controls */}
           <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
             <div className="relative flex-1 min-w-[220px]">
               <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
@@ -289,7 +332,6 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Volunteer Roster Table / Card List */}
           {filteredVolunteers.length === 0 ? (
             <div className="bg-white p-12 rounded-3xl border border-slate-200 shadow-sm text-center space-y-3">
               <Users className="w-10 h-10 text-slate-400 mx-auto" />
@@ -308,11 +350,6 @@ export const AdminDashboard: React.FC = () => {
                       <span className="font-mono text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-bold">
                         ID: {v.id}
                       </span>
-                      {v.userId && (
-                        <span className="font-mono text-[10px] text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 font-bold flex items-center gap-1">
-                          <Key className="w-2.5 h-2.5" /> User: {v.userId}
-                        </span>
-                      )}
                       {v.isVerified ? (
                         <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1">
                           <ShieldCheck className="w-3 h-3 text-emerald-600" /> Verified Responder
@@ -339,7 +376,6 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Actions Column */}
                   <div className="flex items-center gap-2 shrink-0">
                     {!v.isVerified ? (
                       <button
@@ -357,7 +393,6 @@ export const AdminDashboard: React.FC = () => {
                     <button
                       onClick={() => setVolToDelete(v)}
                       className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-extrabold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-all"
-                      title={`Delete volunteer record for ${v.name}`}
                     >
                       <Trash2 className="w-4 h-4 text-rose-600" />
                       <span>Delete</span>
@@ -455,7 +490,190 @@ export const AdminDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 3: RELIEF CAMPS */}
+      {/* TAB 3: MISSING PERSONS COMMAND */}
+      {activeTab === 'missing' && (
+        <div className="space-y-4">
+          <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="relative flex-1 min-w-[220px]">
+              <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search missing person name, last seen location, reporter..."
+                value={missingSearch}
+                onChange={e => setMissingSearch(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            <select
+              value={selectedDistrict}
+              onChange={e => setSelectedDistrict(e.target.value)}
+              className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-bold"
+            >
+              <option value="ALL">All Active Districts</option>
+              {ASSAM_DISTRICTS.map(d => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+          </div>
+
+          {filteredMissing.length === 0 ? (
+            <div className="bg-white p-12 rounded-3xl border border-slate-200 shadow-sm text-center space-y-3">
+              <Search className="w-10 h-10 text-slate-400 mx-auto" />
+              <h3 className="font-extrabold text-slate-800 text-sm">No Missing Person Reports</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">
+                The missing persons registry is completely clean. Reports filed by citizens will appear here for status management & verification.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredMissing.map(m => (
+                <div key={m.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-wrap items-start justify-between gap-4 hover:border-indigo-300 transition-all">
+                  <div className="flex items-start gap-4">
+                    {m.photoUrl ? (
+                      <img src={m.photoUrl} alt={m.fullName} className="w-16 h-16 rounded-2xl object-cover border border-slate-200 shrink-0" />
+                    ) : (
+                      <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 font-extrabold text-xl shrink-0">
+                        👤
+                      </div>
+                    )}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-extrabold text-slate-900 text-base">{m.fullName}</h4>
+                        <span className="text-xs font-semibold text-slate-500">({m.age} yrs • {m.gender})</span>
+                        <span className="font-mono text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-bold">
+                          ID: {m.id}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-700 font-medium">
+                        Last Seen: <strong>{m.lastSeenLocation}</strong> ({m.district}) • Date: <strong>{m.dateMissing}</strong>
+                      </p>
+                      <p className="text-xs text-slate-600 font-medium">{m.details}</p>
+                      <span className="text-[11px] text-slate-500 block font-semibold">
+                        Reporter: {m.reporterName} ({m.reporterPhone})
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Actions & Status Dropdown */}
+                  <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-extrabold text-slate-500 uppercase">Status:</span>
+                      <select
+                        value={m.status}
+                        onChange={e => updateMissingPersonStatus(m.id, e.target.value as any)}
+                        className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-extrabold text-slate-900 focus:outline-none focus:border-indigo-500"
+                      >
+                        <option value="missing">🔴 Missing</option>
+                        <option value="found_safe">🟢 Found Safe</option>
+                        <option value="hospitalized">🟡 Hospitalized</option>
+                        <option value="deceased">⚫ Deceased</option>
+                      </select>
+                    </div>
+
+                    <button
+                      onClick={() => setMissingToDelete(m)}
+                      className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-extrabold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-rose-600" /> Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 4: ROAD HAZARDS COMMAND */}
+      {activeTab === 'roads' && (
+        <div className="space-y-4">
+          <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
+            <span className="font-extrabold text-slate-900">Filter Road Hazards by Base District:</span>
+            <select
+              value={selectedDistrict}
+              onChange={e => setSelectedDistrict(e.target.value)}
+              className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-bold"
+            >
+              <option value="ALL">All Active Districts</option>
+              {ASSAM_DISTRICTS.map(d => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+          </div>
+
+          {filteredRoads.length === 0 ? (
+            <div className="bg-white p-12 rounded-3xl border border-slate-200 shadow-sm text-center space-y-3">
+              <Compass className="w-10 h-10 text-slate-400 mx-auto" />
+              <h3 className="font-extrabold text-slate-800 text-sm">No Road Hazard Reports</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">
+                Road status reports are completely clean. Blocked highways or bridge collapsed reports will appear here for status updates and deletion.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredRoads.map(r => (
+                <div key={r.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-wrap items-start justify-between gap-4 hover:border-amber-300 transition-all">
+                  <div className="space-y-1 max-w-xl">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="font-extrabold text-slate-900 text-base">{r.roadName}</h4>
+                      <span className="font-mono text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-bold">
+                        ID: {r.id}
+                      </span>
+                      <span className="text-xs font-extrabold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300">
+                        {r.district}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-700 font-medium">{r.details}</p>
+
+                    {r.telemetrics && (
+                      <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-200 text-[11px] text-slate-700 font-semibold flex flex-wrap gap-3">
+                        <span>Depth: <strong>{r.telemetrics.waterDepthMeters} m ({r.telemetrics.waterDepthFeet} ft)</strong></span>
+                        <span>Obstacle: <strong>{r.telemetrics.obstacleType}</strong></span>
+                        <span>Structural Risk: <strong className="text-rose-600">{r.telemetrics.structuralRiskScore}/100</strong></span>
+                      </div>
+                    )}
+
+                    <span className="text-[11px] text-slate-500 block font-semibold">
+                      Reported by: {r.reportedBy} at {r.reportedAt}
+                    </span>
+                  </div>
+
+                  {/* Actions & Status Dropdown */}
+                  <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-extrabold text-slate-500 uppercase">Road Condition:</span>
+                      <select
+                        value={r.status}
+                        onChange={e => updateRoadReportStatus(r.id, e.target.value as any)}
+                        className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-extrabold text-slate-900 focus:outline-none focus:border-amber-500"
+                      >
+                        <option value="open">🟢 Open / Passable</option>
+                        <option value="waterlogged">🌊 Waterlogged</option>
+                        <option value="tree_fallen">🪵 Fallen Tree / Obstacle</option>
+                        <option value="landslide">⛰️ Landslide Hazard</option>
+                        <option value="bridge_collapse">💥 Bridge Structural Collapse</option>
+                        <option value="boat_required">🚤 Motorboat Squad Only</option>
+                        <option value="closed">🔴 Road Closed</option>
+                      </select>
+                    </div>
+
+                    <button
+                      onClick={() => setRoadToDelete(r)}
+                      className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-extrabold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-rose-600" /> Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 5: RELIEF CAMPS */}
       {activeTab === 'camps' && (
         <div className="space-y-4">
           {camps.length === 0 ? (
@@ -495,7 +713,7 @@ export const AdminDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 4: NGO WAREHOUSES */}
+      {/* TAB 6: NGO WAREHOUSES */}
       {activeTab === 'ngos' && (
         <div className="space-y-4">
           {ngos.length === 0 ? (
@@ -529,7 +747,7 @@ export const AdminDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 5: DISTRICT TRIAGE RADAR */}
+      {/* TAB 7: DISTRICT TRIAGE RADAR */}
       {activeTab === 'heatmap' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {ASSAM_DISTRICTS.map((dist) => {
@@ -597,6 +815,44 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex gap-2 pt-2 text-xs font-bold">
               <button type="button" onClick={() => setIncidentToDelete(null)} className="flex-1 bg-slate-100 py-3 rounded-xl">Cancel</button>
               <button type="button" onClick={() => { deleteIncident(incidentToDelete.id); setIncidentToDelete(null); }} className="flex-1 bg-rose-600 text-white py-3 rounded-xl">Delete Incident</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE MISSING PERSON MODAL */}
+      {missingToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-6">
+            <div className="flex items-center justify-between border-b border-rose-100 pb-3">
+              <h3 className="font-heading font-extrabold text-base text-rose-700 flex items-center gap-2">
+                <Trash2 className="w-5 h-5 text-rose-600" /> Confirm Missing Person Deletion
+              </h3>
+              <button onClick={() => setMissingToDelete(null)} className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><X className="w-4 h-4" /></button>
+            </div>
+            <p className="text-xs text-slate-700 font-medium">Remove missing person report for <strong>"{missingToDelete.fullName}"</strong> ({missingToDelete.id})?</p>
+            <div className="flex gap-2 pt-2 text-xs font-bold">
+              <button type="button" onClick={() => setMissingToDelete(null)} className="flex-1 bg-slate-100 py-3 rounded-xl">Cancel</button>
+              <button type="button" onClick={() => { deleteMissingPerson(missingToDelete.id); setMissingToDelete(null); }} className="flex-1 bg-rose-600 text-white py-3 rounded-xl">Delete Record</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE ROAD HAZARD MODAL */}
+      {roadToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-6">
+            <div className="flex items-center justify-between border-b border-rose-100 pb-3">
+              <h3 className="font-heading font-extrabold text-base text-rose-700 flex items-center gap-2">
+                <Trash2 className="w-5 h-5 text-rose-600" /> Confirm Road Report Deletion
+              </h3>
+              <button onClick={() => setRoadToDelete(null)} className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><X className="w-4 h-4" /></button>
+            </div>
+            <p className="text-xs text-slate-700 font-medium">Delete road hazard report for <strong>"{roadToDelete.roadName}"</strong> ({roadToDelete.id})?</p>
+            <div className="flex gap-2 pt-2 text-xs font-bold">
+              <button type="button" onClick={() => setRoadToDelete(null)} className="flex-1 bg-slate-100 py-3 rounded-xl">Cancel</button>
+              <button type="button" onClick={() => { deleteRoadReport(roadToDelete.id); setRoadToDelete(null); }} className="flex-1 bg-rose-600 text-white py-3 rounded-xl">Delete Report</button>
             </div>
           </div>
         </div>

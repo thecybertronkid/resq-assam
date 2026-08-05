@@ -71,8 +71,10 @@ interface AppContextType {
   addNGO: (ngo: NGOInventory) => void;
   updateNgoStock: (ngoId: string, itemKey: keyof NGOInventory['items'], quantity: number) => void;
   addMissingPerson: (person: Omit<MissingPerson, 'id'>) => void;
+  updateMissingPersonStatus: (id: string, status: MissingPerson['status']) => void;
   deleteMissingPerson: (id: string) => void;
   addRoadReport: (report: Omit<RoadReport, 'id' | 'reportedAt'>) => void;
+  updateRoadReportStatus: (id: string, status: RoadReport['status']) => void;
   deleteRoadReport: (id: string) => void;
   addDonation: (donation: Omit<Donation, 'id' | 'receiptNo' | 'timestamp'>) => void;
   resetPlatformData: () => void;
@@ -482,10 +484,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`🗑️ Relief Camp ${id} closed & deleted by Admin.`);
   };
 
+  const updateMissingPersonStatus = (id: string, status: MissingPerson['status']) => {
+    setMissingPersons(prev => prev.map(p => {
+      if (p.id === id) {
+        const updated = { ...p, status };
+        dbService.saveMissingPerson(updated);
+        return updated;
+      }
+      return p;
+    }));
+    showToast(`🔍 Missing person ${id} status updated to "${status.replace('_', ' ').toUpperCase()}".`);
+  };
+
   const deleteMissingPerson = (id: string) => {
     setMissingPersons(prev => prev.filter(p => p.id !== id));
     dbService.deleteMissingPerson(id);
     showToast(`🗑️ Missing person report ${id} removed.`);
+  };
+
+  const updateRoadReportStatus = (id: string, status: RoadReport['status']) => {
+    setRoadReports(prev => prev.map(r => {
+      if (r.id === id) {
+        const updated = { ...r, status };
+        dbService.saveRoadReport(updated);
+        return updated;
+      }
+      return r;
+    }));
+    showToast(`🚧 Road report ${id} status updated to "${status.replace('_', ' ').toUpperCase()}".`);
   };
 
   const deleteRoadReport = (id: string) => {
@@ -563,8 +589,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addNGO,
         updateNgoStock,
         addMissingPerson,
+        updateMissingPersonStatus,
         deleteMissingPerson,
         addRoadReport,
+        updateRoadReportStatus,
         deleteRoadReport,
         addDonation,
         resetPlatformData
