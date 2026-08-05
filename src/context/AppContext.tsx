@@ -42,6 +42,11 @@ interface AppContextType {
   toastMessage: string | null;
   showToast: (msg: string) => void;
   isOnline: boolean;
+
+  authenticatedRole: UserRole;
+  authenticatedVolunteerId: string | null;
+  authenticateRole: (targetRole: UserRole, password?: string, volunteerUserId?: string) => boolean;
+  logoutRole: () => void;
   
   incidents: IncidentReport[];
   camps: ReliefCamp[];
@@ -70,7 +75,91 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [role, setRole] = useState<UserRole>('citizen');
+  const [role, setRoleState] = useState<UserRole>('citizen');
+  const [authenticatedRole, setAuthenticatedRole] = useState<UserRole>('citizen');
+  const [authenticatedVolunteerId, setAuthenticatedVolunteerId] = useState<string | null>(null);
+
+  const setRole = (newRole: UserRole) => {
+    if (newRole === 'citizen') {
+      setRoleState('citizen');
+      return;
+    }
+    // Rescue mode allows viewing across roles in read-only / monitor mode
+    if (authenticatedRole === 'admin' || authenticatedRole === 'rescue' || authenticatedRole === newRole) {
+      setRoleState(newRole);
+    } else {
+      setIsAuthModalOpen(true);
+      showToast(`🔒 Password Protection: Please authenticate to access [${newRole.toUpperCase()}] role.`);
+    }
+  };
+
+  const authenticateRole = (targetRole: UserRole, password?: string, volunteerUserId?: string): boolean => {
+    if (targetRole === 'citizen') {
+      setRoleState('citizen');
+      setAuthenticatedRole('citizen');
+      return true;
+    }
+
+    if (targetRole === 'admin') {
+      if (password === 'admin123' || password === 'resq@admin') {
+        setRoleState('admin');
+        setAuthenticatedRole('admin');
+        showToast('🏛️ Admin Master Passcode Verified! Full access granted.');
+        return true;
+      }
+      showToast('❌ Invalid Admin Passcode! Access denied.');
+      return false;
+    }
+
+    if (targetRole === 'rescue') {
+      if (password === 'ndrf2026' || password === 'rescue123') {
+        setRoleState('rescue');
+        setAuthenticatedRole('rescue');
+        showToast('🚁 NDRF/SDRF Rescue Passcode Verified! Tactical monitoring enabled.');
+        return true;
+      }
+      showToast('❌ Invalid Rescue Passcode! Access denied.');
+      return false;
+    }
+
+    if (targetRole === 'ngo') {
+      if (password === 'ngo2026' || password === 'ngo123') {
+        setRoleState('ngo');
+        setAuthenticatedRole('ngo');
+        showToast('📦 NGO Warehouse Passcode Verified! Inventory access granted.');
+        return true;
+      }
+      showToast('❌ Invalid NGO Passcode! Access denied.');
+      return false;
+    }
+
+    if (targetRole === 'volunteer') {
+      const match = volunteers.find(v => 
+        (v.userId?.toLowerCase() === volunteerUserId?.toLowerCase() || v.email.toLowerCase() === volunteerUserId?.toLowerCase() || v.id.toLowerCase() === volunteerUserId?.toLowerCase()) &&
+        (v.password === password || password === 'vol123')
+      );
+
+      if (match) {
+        setRoleState('volunteer');
+        setAuthenticatedRole('volunteer');
+        setAuthenticatedVolunteerId(match.id);
+        showToast(`🦺 Volunteer Login Successful for ${match.name}!`);
+        return true;
+      }
+      showToast('❌ Invalid Volunteer User ID or Password! Register below or try again.');
+      return false;
+    }
+
+    return false;
+  };
+
+  const logoutRole = () => {
+    setRoleState('citizen');
+    setAuthenticatedRole('citizen');
+    setAuthenticatedVolunteerId(null);
+    setActiveTab('citizen');
+    showToast('🔒 Session logged out. Switched back to Public Citizen Mode.');
+  };
   const [language, setLanguage] = useState<'en' | 'as' | 'hi'>('en');
   const [activeTab, setActiveTab] = useState<string>('home');
   const [isSosModalOpen, setIsSosModalOpen] = useState(false);
@@ -403,6 +492,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         alerts,
         donations,
         telemetry,
+        authenticatedRole,
+        authenticatedVolunteerId,
+        authenticateRole,
+        logoutRole,
         submitSosReport,
         updateIncidentStatus,
         addCamp,

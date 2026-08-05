@@ -144,6 +144,9 @@ export const VolunteerDashboard: React.FC = () => {
     }
   };
 
+  const [regUserId, setRegUserId] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone) return;
@@ -157,7 +160,12 @@ export const VolunteerDashboard: React.FC = () => {
       ? areaParts.join(' • ') 
       : (serviceableArea || `${district} Central Sector`);
 
+    const chosenUserId = regUserId.trim() || `vol_${name.toLowerCase().replace(/\s+/g, '')}`;
+    const chosenPassword = regPassword || 'vol123';
+
     addVolunteer({
+      userId: chosenUserId,
+      password: chosenPassword,
       name,
       phone,
       email: email || `${name.toLowerCase().replace(/\s+/g, '')}@resq.org`,
@@ -168,9 +176,13 @@ export const VolunteerDashboard: React.FC = () => {
       lat,
       lng
     });
+
+    showToast(`🎉 Volunteer Registered! Your Login User ID: "${chosenUserId}" | Password: "${chosenPassword}"`);
     setName('');
     setPhone('');
     setEmail('');
+    setRegUserId('');
+    setRegPassword('');
     setSubDivision('');
     setRevenueCircle('');
     setLocalArea('');
@@ -515,6 +527,32 @@ export const VolunteerDashboard: React.FC = () => {
                       value={phone}
                       onChange={e => setPhone(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium"
+                    />
+                  </div>
+                </div>
+
+                {/* Account Credentials */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                  <div>
+                    <label className="block text-slate-800 mb-1 font-bold">Set Volunteer User ID *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. vol_rupam"
+                      value={regUserId}
+                      onChange={e => setRegUserId(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-800 mb-1 font-bold">Set Account Password *</label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="Create password"
+                      value={regPassword}
+                      onChange={e => setRegPassword(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-bold"
                     />
                   </div>
                 </div>

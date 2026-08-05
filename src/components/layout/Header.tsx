@@ -29,6 +29,8 @@ export const Header: React.FC = () => {
   const { 
     role, 
     setRole, 
+    authenticatedRole,
+    logoutRole,
     language, 
     setLanguage, 
     activeTab, 
@@ -299,15 +301,26 @@ export const Header: React.FC = () => {
               </div>
             </div>
 
-            {/* Role Switcher Pill */}
-            <button
-              onClick={() => setIsAuthModalOpen(true)}
-              className={`hidden sm:flex px-2.5 py-1.5 rounded-xl text-xs font-bold border items-center gap-1.5 transition-all hover:scale-[1.03] ${currentRoleCfg.badgeColor}`}
-              title="Switch Active Disaster Response Persona"
-            >
-              <UserCheck className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">{currentRoleCfg.title}</span>
-            </button>
+            {/* Role Switcher & Auth Pill */}
+            {authenticatedRole !== 'citizen' ? (
+              <button
+                onClick={logoutRole}
+                className="hidden sm:flex px-2.5 py-1.5 rounded-xl text-xs font-extrabold border bg-rose-50 text-rose-800 border-rose-300 items-center gap-1.5 transition-all hover:bg-rose-100 shadow-2xs"
+                title="Log Out Session & Return to Citizen Mode"
+              >
+                <UserCheck className="w-3.5 h-3.5 text-rose-600" />
+                <span className="hidden md:inline">{currentRoleCfg.title} (Logout)</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className={`hidden sm:flex px-2.5 py-1.5 rounded-xl text-xs font-bold border items-center gap-1.5 transition-all hover:scale-[1.03] ${currentRoleCfg.badgeColor}`}
+                title="Authenticate Password-Protected Role Access"
+              >
+                <UserCheck className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">{currentRoleCfg.title}</span>
+              </button>
+            )}
 
             {/* Dynamic Role Action CTA Button */}
             <button

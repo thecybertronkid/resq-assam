@@ -67,6 +67,8 @@ export interface ReliefCamp {
 
 export interface Volunteer {
   id: string;
+  userId?: string;
+  password?: string;
   name: string;
   phone: string;
   email: string;
