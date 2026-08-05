@@ -38,7 +38,7 @@ const MainContent: React.FC = () => {
     : 'bg-slate-900 border-slate-700';
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-pink-400 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-pink-400 selection:text-white w-full max-w-full overflow-x-hidden">
       {/* Header Bar */}
       <Header />
 
@@ -62,8 +62,8 @@ const MainContent: React.FC = () => {
       )}
 
       {/* Page Transition Wrapper */}
-      <main className="flex-1">
-        <div key={activeTab} className="animate-fade-in">
+      <main className="flex-1 w-full max-w-full overflow-x-hidden">
+        <div key={activeTab} className="animate-fade-in w-full max-w-full">
           {activeTab === 'home' && <LandingPage />}
           {activeTab === 'map' && <LiveIncidentMap />}
           {activeTab === 'citizen' && <CitizenDashboard />}

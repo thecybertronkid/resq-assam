@@ -253,11 +253,11 @@ export const Header: React.FC = () => {
           </nav>
 
           {/* Right Action Bar */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* AI Copilot Trigger */}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            {/* AI Copilot Trigger — hidden on mobile header, available in mobile drawer */}
             <button
               onClick={() => setIsAiDrawerOpen(true)}
-              className="p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs hover:shadow-sky-200/50 hover:scale-[1.03]"
+              className="hidden sm:flex p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 text-xs font-bold items-center gap-1.5 transition-all shadow-2xs hover:shadow-sky-200/50 hover:scale-[1.03]"
               title="AI Emergency Copilot"
             >
               <Sparkles className="w-3.5 h-3.5 text-sky-600" />
@@ -267,7 +267,7 @@ export const Header: React.FC = () => {
             {/* Alerts Bell */}
             <button
               onClick={() => setActiveTab('alerts')}
-              className="relative p-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 transition-all hover:scale-[1.03]"
+              className="relative p-1.5 sm:p-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 transition-all hover:scale-[1.03]"
               title="Disaster Alerts"
             >
               <Bell className="w-3.5 h-3.5 text-slate-500" />
@@ -278,8 +278,8 @@ export const Header: React.FC = () => {
               )}
             </button>
 
-            {/* Language Switcher */}
-            <div className="relative group">
+            {/* Language Switcher — hidden on mobile header, available in mobile drawer */}
+            <div className="relative group hidden sm:block">
               <button className="p-1.5 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1 transition-colors">
                 <Globe className="w-3.5 h-3.5 text-slate-500" />
                 <span className="uppercase font-bold text-[11px] sm:text-xs">{language}</span>
@@ -325,16 +325,17 @@ export const Header: React.FC = () => {
             {/* Dynamic Role Action CTA Button */}
             <button
               onClick={currentRoleCfg.ctaAction}
-              className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-extrabold px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs flex items-center gap-1.5 shadow-md shadow-pink-500/25 border border-rose-300/50 animate-sos-pulse transition-all hover:scale-[1.03] hover:shadow-pink-500/40"
+              className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-extrabold px-2 sm:px-3.5 py-1.5 rounded-xl text-[10px] sm:text-xs flex items-center gap-1 shadow-md shadow-pink-500/25 border border-rose-300/50 animate-sos-pulse transition-all shrink-0"
             >
-              <CtaIcon className="w-3.5 h-3.5" />
-              <span className="whitespace-nowrap">{currentRoleCfg.ctaLabel}</span>
+              <CtaIcon className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline whitespace-nowrap">{currentRoleCfg.ctaLabel}</span>
+              <span className="inline sm:hidden font-extrabold uppercase text-[10px]">SOS</span>
             </button>
 
             {/* Mobile Hamburger Menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-slate-700 hover:text-slate-900 rounded-xl hover:bg-slate-100 border border-slate-200 transition-all active:scale-95"
+              className="lg:hidden p-1.5 sm:p-2 text-slate-700 hover:text-slate-900 rounded-xl hover:bg-slate-100 border border-slate-200 transition-all active:scale-95 shrink-0"
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen 
