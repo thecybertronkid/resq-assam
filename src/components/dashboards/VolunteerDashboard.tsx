@@ -87,6 +87,34 @@ export const VolunteerDashboard: React.FC = () => {
     { id: 'logistics', label: '📦 Food & Supply Logistics' }
   ];
 
+  const [isDetectingResponderGps, setIsDetectingResponderGps] = useState(false);
+
+  const handleDetectResponderGps = () => {
+    if (!navigator.geolocation) {
+      showToast('⚠️ Geolocation not supported by browser. Enter coordinates manually.');
+      return;
+    }
+    setIsDetectingResponderGps(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const newLat = Number(pos.coords.latitude.toFixed(4));
+        const newLng = Number(pos.coords.longitude.toFixed(4));
+        setResponderLat(newLat);
+        setResponderLng(newLng);
+        setIsDetectingResponderGps(false);
+        if (activeVerifiedVol) {
+          updateVolunteerLocation(activeVerifiedVol.id, newLat, newLng);
+        }
+        showToast(`📍 Auto-detected Live GPS: (${newLat}, ${newLng})! Plotted on Live Map.`);
+      },
+      () => {
+        setIsDetectingResponderGps(false);
+        showToast('⚠️ GPS permission denied or timed out. Enter coordinates manually.');
+      },
+      { timeout: 8000 }
+    );
+  };
+
   const handleFetchGps = () => {
     if (!navigator.geolocation) {
       showToast('⚠️ Geolocation not supported by browser. Using district default.');
@@ -295,13 +323,25 @@ export const VolunteerDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => updateVolunteerLocation(activeVerifiedVol.id, responderLat, responderLng)}
-                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
-                >
-                  <MapPin className="w-4 h-4" />
-                  Update Live GPS Marker on Live Incident Map
-                </button>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleDetectResponderGps}
+                    disabled={isDetectingResponderGps}
+                    className="bg-sky-600 hover:bg-sky-500 text-white font-extrabold px-3 py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-2xs border border-sky-400/30 shrink-0"
+                  >
+                    <Navigation className={`w-3.5 h-3.5 ${isDetectingResponderGps ? 'animate-spin' : ''}`} />
+                    {isDetectingResponderGps ? 'Detecting GPS...' : 'Detect My Live GPS'}
+                  </button>
+
+                  <button
+                    onClick={() => updateVolunteerLocation(activeVerifiedVol.id, responderLat, responderLng)}
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    Update Live GPS Marker on Map
+                  </button>
+                </div>
               </div>
             </div>
           </div>
