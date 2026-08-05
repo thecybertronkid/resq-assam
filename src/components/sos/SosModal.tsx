@@ -13,11 +13,12 @@ import {
   Sparkles, 
   AlertOctagon,
   CheckCircle,
-  WifiOff
+  WifiOff,
+  Trash2
 } from 'lucide-react';
 
 export const SosModal: React.FC = () => {
-  const { isSosModalOpen, setIsSosModalOpen, submitSosReport, isOnline } = useApp();
+  const { isSosModalOpen, setIsSosModalOpen, submitSosReport, isOnline, showToast } = useApp();
 
   const [reporterName, setReporterName] = useState('');
   const [reporterPhone, setReporterPhone] = useState('');
@@ -357,8 +358,25 @@ export const SosModal: React.FC = () => {
               )}
             </div>
             {audioUrl && (
-              <div className="pt-2">
-                <p className="text-[11px] text-emerald-700 font-bold mb-1">✓ Voice recording captured. Preview:</p>
+              <div className="pt-2 space-y-1.5">
+                <div className="flex items-center justify-between text-[11px] text-emerald-700 font-bold">
+                  <span>✓ Voice recording captured. Preview:</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAudioUrl(null);
+                      audioChunksRef.current = [];
+                      if (mediaRecorderRef.current) {
+                        mediaRecorderRef.current = null;
+                      }
+                      showToast('🗑️ Captured Voice SOS Note deleted!');
+                    }}
+                    className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200 flex items-center gap-1 font-extrabold transition-all"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Voice Note</span>
+                  </button>
+                </div>
                 <audio src={audioUrl} controls className="w-full h-8" />
               </div>
             )}
