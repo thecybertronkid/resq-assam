@@ -194,7 +194,7 @@ export const VolunteerDashboard: React.FC = () => {
       lng
     });
 
-    showToast(`🎉 Volunteer Registered! Your Auto-Assigned User ID: "${autoGenVolunteerId}" | Password: "${chosenPassword}"`);
+    showToast(`🎉 Volunteer Application Submitted! Your Auto-Assigned User ID is "${autoGenVolunteerId}". Password saved securely.`);
     setName('');
     setPhone('');
     setEmail('');

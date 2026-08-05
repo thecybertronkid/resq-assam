@@ -28,7 +28,7 @@ export const AuthModal: React.FC = () => {
       desc: 'Access private volunteer portal, accept field tasks, update live GPS telemetry', 
       icon: '🦺',
       requiresPass: true,
-      demoHint: 'Use your Volunteer ID (e.g. VOL-SIVA-0001) & Password'
+      demoHint: 'Enter your Volunteer ID & Password'
     },
     { 
       id: 'ngo', 
@@ -36,7 +36,7 @@ export const AuthModal: React.FC = () => {
       desc: 'Manage relief inventory, track item distribution, generate 80G e-receipts', 
       icon: '📦',
       requiresPass: true,
-      demoHint: 'Demo Passcode: ngo2026'
+      demoHint: 'Enter Authorized NGO Passcode'
     },
     { 
       id: 'rescue', 
@@ -44,7 +44,7 @@ export const AuthModal: React.FC = () => {
       desc: 'Monitor all roles, accept tactical missions, assign boat/heli units', 
       icon: '🚁',
       requiresPass: true,
-      demoHint: 'Demo Passcode: ndrf2026'
+      demoHint: 'Enter Authorized Rescue Passcode'
     },
     { 
       id: 'admin', 
@@ -52,7 +52,7 @@ export const AuthModal: React.FC = () => {
       desc: 'Statewide command, AI duplicate moderation, volunteer approvals, CSV exports', 
       icon: '🏛️',
       requiresPass: true,
-      demoHint: 'Demo Passcode: admin123'
+      demoHint: 'Enter Master Admin Passcode'
     }
   ];
 
