@@ -25,6 +25,9 @@ export const VolunteerDashboard: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [district, setDistrict] = useState(ASSAM_DISTRICTS[0]);
+  const [subDivision, setSubDivision] = useState('');
+  const [revenueCircle, setRevenueCircle] = useState('');
+  const [localArea, setLocalArea] = useState('');
   const [serviceableArea, setServiceableArea] = useState('');
   const [selectedSkills, setSelectedSkills] = useState<string[]>(['swimmer', 'doctor']);
   const [isAvailable, setIsAvailable] = useState(true);
@@ -54,18 +57,31 @@ export const VolunteerDashboard: React.FC = () => {
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone) return;
+
+    const areaParts = [];
+    if (subDivision.trim()) areaParts.push(`Sub-Div: ${subDivision.trim()}`);
+    if (revenueCircle.trim()) areaParts.push(`Circle: ${revenueCircle.trim()}`);
+    if (localArea.trim()) areaParts.push(`Village/Ward: ${localArea.trim()}`);
+
+    const compiledServiceableArea = areaParts.length > 0 
+      ? areaParts.join(' • ') 
+      : (serviceableArea || `${district} Central Sector`);
+
     addVolunteer({
       name,
       phone,
       email: email || `${name.toLowerCase().replace(/\s+/g, '')}@resq.org`,
       district,
-      serviceableArea: serviceableArea || `${district} Central Sector`,
+      serviceableArea: compiledServiceableArea,
       skills: selectedSkills as any,
       available: isAvailable
     });
     setName('');
     setPhone('');
     setEmail('');
+    setSubDivision('');
+    setRevenueCircle('');
+    setLocalArea('');
     setServiceableArea('');
   };
 
@@ -93,19 +109,18 @@ export const VolunteerDashboard: React.FC = () => {
             </h2>
 
             <form onSubmit={handleRegister} className="space-y-4 text-xs text-slate-700">
-              <div>
-                <label className="block text-slate-700 mb-1 font-bold">Full Name *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Rupam Saikia"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 mb-1 font-bold">Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Rupam Saikia"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium"
+                  />
+                </div>
                 <div>
                   <label className="block text-slate-700 mb-1 font-bold">Mobile Phone *</label>
                   <input
@@ -117,31 +132,66 @@ export const VolunteerDashboard: React.FC = () => {
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium"
                   />
                 </div>
-                <div>
-                  <label className="block text-slate-700 mb-1 font-bold">Base District *</label>
-                  <select
-                    value={district}
-                    onChange={e => setDistrict(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-bold"
-                  >
-                    {ASSAM_DISTRICTS.map(d => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </select>
-                </div>
               </div>
+              {/* Detailed Serviceable Operational Area Breakdown */}
+              <div className="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-200/80 space-y-3">
+                <div className="flex items-center gap-1.5 font-bold text-slate-900 text-xs">
+                  <MapPin className="w-4 h-4 text-emerald-600" />
+                  <span>Serviceable Area Telemetry Breakdown</span>
+                </div>
 
-              {/* FIX 1: Serviceable Area input */}
-              <div>
-                <label className="block text-slate-700 mb-1 font-bold">Serviceable Area / Panchayats *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Sivasagar East, Jorhat North Sector"
-                  value={serviceableArea}
-                  onChange={e => setServiceableArea(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium"
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-700 mb-1 font-bold">Base District *</label>
+                    <select
+                      value={district}
+                      onChange={e => setDistrict(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-bold"
+                    >
+                      {ASSAM_DISTRICTS.map(d => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 mb-1 font-bold">Sub-Division / Tehsil *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Sivasagar Sadar, Nazira, Titabor"
+                      value={subDivision}
+                      onChange={e => setSubDivision(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-700 mb-1 font-bold">Revenue Circle / Dev Block *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Amguri Circle, Sonari, Teok"
+                      value={revenueCircle}
+                      onChange={e => setRevenueCircle(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 mb-1 font-bold">Village / Panchayat / Ward *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Disangmukh GP, Ward No. 4, Namti"
+                      value={localArea}
+                      onChange={e => setLocalArea(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-medium"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div>
