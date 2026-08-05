@@ -331,10 +331,9 @@ export const DonationPortal: React.FC = () => {
               <p>
                 All monetary contributions to the ResQ Assam Emergency Fund are <strong>100% Tax-Exempt under Section 80G</strong> of the Income Tax Act, 1961 (Certificate No. AAATD8921DF20264).
               </p>
-              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1">
-                <span className="text-[10px] text-slate-500 font-bold block uppercase">Gateway Credentials:</span>
-                <p className="text-slate-900 font-mono text-[11px]">Key ID: {RAZORPAY_KEY_ID}</p>
-                <p className="text-emerald-700 font-bold text-[11px]">Status: Razorpay Live Production Engine</p>
+              <div className="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-200 space-y-1">
+                <span className="text-[10px] text-slate-500 font-bold block uppercase">Payment Security Status:</span>
+                <p className="text-emerald-800 font-bold text-[11px]">🔒 Razorpay Live Production Gateway (256-Bit SSL Encrypted)</p>
               </div>
             </div>
           </div>
@@ -343,8 +342,8 @@ export const DonationPortal: React.FC = () => {
 
       {/* HTML TAX-EXEMPT 80G RECEIPT MODAL */}
       {receiptData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md overflow-y-auto">
-          <div className="bg-white border border-pink-300 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 text-slate-900 relative">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md min-h-screen overflow-y-auto">
+          <div className="bg-white border border-pink-300 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 text-slate-900 relative my-auto">
             
             {/* Print Header Actions */}
             <div className="bg-slate-900 text-white p-4 flex items-center justify-between print:hidden">
