@@ -32,9 +32,8 @@ export const AiVisionAnalysisModal: React.FC<Props> = ({ analysis, onClose, phot
   const { analysis: a, dashboard_cards, natural_language_summary, confidence_engine, image_quality, overlay_image_base64 } = analysis;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-md">
-      <div className="flex min-h-full items-start justify-center p-4 sm:p-6">
-        <div className="bg-white border border-purple-200 w-full max-w-4xl rounded-3xl p-6 space-y-6 text-xs text-slate-900 shadow-2xl my-6 animate-fade-in relative">
+    <div className="fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/80 backdrop-blur-md min-h-screen flex items-center justify-center p-4 sm:p-6">
+      <div className="bg-white border border-purple-200 w-full max-w-4xl rounded-3xl p-6 space-y-6 text-xs text-slate-900 shadow-2xl my-auto animate-fade-in relative">
           
           {/* Close Button */}
           <button
@@ -287,6 +286,5 @@ export const AiVisionAnalysisModal: React.FC<Props> = ({ analysis, onClose, phot
           )}
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };

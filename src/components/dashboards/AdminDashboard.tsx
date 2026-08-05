@@ -784,8 +784,8 @@ export const AdminDashboard: React.FC = () => {
 
       {/* DELETE VOLUNTEER MODAL */}
       {volToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-6">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm min-h-screen overflow-y-auto">
+          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-auto">
             <div className="flex items-center justify-between border-b border-rose-100 pb-3">
               <h3 className="font-heading font-extrabold text-base text-rose-700 flex items-center gap-2">
                 <Trash2 className="w-5 h-5 text-rose-600" /> Confirm Volunteer Deletion
@@ -803,8 +803,8 @@ export const AdminDashboard: React.FC = () => {
 
       {/* DELETE INCIDENT MODAL */}
       {incidentToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-6">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm min-h-screen overflow-y-auto">
+          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-auto">
             <div className="flex items-center justify-between border-b border-rose-100 pb-3">
               <h3 className="font-heading font-extrabold text-base text-rose-700 flex items-center gap-2">
                 <Trash2 className="w-5 h-5 text-rose-600" /> Confirm Incident Deletion
@@ -822,8 +822,8 @@ export const AdminDashboard: React.FC = () => {
 
       {/* DELETE MISSING PERSON MODAL */}
       {missingToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-6">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm min-h-screen overflow-y-auto">
+          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-auto">
             <div className="flex items-center justify-between border-b border-rose-100 pb-3">
               <h3 className="font-heading font-extrabold text-base text-rose-700 flex items-center gap-2">
                 <Trash2 className="w-5 h-5 text-rose-600" /> Confirm Missing Person Deletion
@@ -841,8 +841,8 @@ export const AdminDashboard: React.FC = () => {
 
       {/* DELETE ROAD HAZARD MODAL */}
       {roadToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-6">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm min-h-screen overflow-y-auto">
+          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-auto">
             <div className="flex items-center justify-between border-b border-rose-100 pb-3">
               <h3 className="font-heading font-extrabold text-base text-rose-700 flex items-center gap-2">
                 <Trash2 className="w-5 h-5 text-rose-600" /> Confirm Road Report Deletion
@@ -860,8 +860,8 @@ export const AdminDashboard: React.FC = () => {
 
       {/* MASTER RESET CONFIRMATION MODAL */}
       {showResetConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md overflow-y-auto">
-          <div className="bg-white border border-rose-300 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-6">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md min-h-screen overflow-y-auto">
+          <div className="bg-white border border-rose-300 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-auto">
             <div className="flex items-center gap-3 text-rose-600">
               <AlertTriangle className="w-8 h-8 shrink-0" />
               <div>

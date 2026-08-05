@@ -135,7 +135,8 @@ export const Header: React.FC = () => {
   const unreadAlerts = alerts.filter(a => a.severity === 'critical').length;
 
   return (
-    <header className={`sticky top-0 z-40 transition-all duration-300 ${
+    <>
+      <header className={`sticky top-0 z-40 transition-all duration-300 ${
       scrolled 
         ? 'bg-white/98 backdrop-blur-xl shadow-lg shadow-slate-200/60 border-b border-slate-200/90' 
         : 'bg-white/95 backdrop-blur-lg border-b border-slate-200/70'
@@ -458,56 +459,57 @@ export const Header: React.FC = () => {
           </button>
         </div>
       )}
+    </header>
 
-      {/* LOGOUT CONFIRMATION MODAL */}
-      {showLogoutConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md overflow-y-auto">
-          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 animate-in fade-in zoom-in-95 my-6">
-            <div className="flex items-center justify-between border-b border-rose-100 pb-3">
-              <div className="flex items-center gap-2.5 text-rose-600">
-                <div className="w-9 h-9 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center font-bold text-lg">
-                  🔒
-                </div>
-                <div>
-                  <h3 className="font-heading font-extrabold text-slate-900 text-base">Confirm Session Logout</h3>
-                  <p className="text-[11px] text-slate-500 font-medium">Switch session back to Public Citizen Mode</p>
-                </div>
+    {/* LOGOUT CONFIRMATION MODAL - Viewport Centered */}
+    {showLogoutConfirmModal && (
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md min-h-screen overflow-y-auto">
+        <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 animate-in fade-in zoom-in-95 my-auto">
+          <div className="flex items-center justify-between border-b border-rose-100 pb-3">
+            <div className="flex items-center gap-2.5 text-rose-600">
+              <div className="w-9 h-9 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center font-bold text-lg">
+                🔒
               </div>
-              <button
-                onClick={() => setShowLogoutConfirmModal(false)}
-                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              <div>
+                <h3 className="font-heading font-extrabold text-slate-900 text-base">Confirm Session Logout</h3>
+                <p className="text-[11px] text-slate-500 font-medium">Switch session back to Public Citizen Mode</p>
+              </div>
             </div>
+            <button
+              onClick={() => setShowLogoutConfirmModal(false)}
+              className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
 
-            <p className="text-xs text-slate-700 font-medium leading-relaxed bg-rose-50/70 p-3.5 rounded-2xl border border-rose-200">
-              Are you sure you want to log out of your <strong>{currentRoleCfg.title}</strong> session? You will lose active session controls and return to Public Citizen Mode.
-            </p>
+          <p className="text-xs text-slate-700 font-medium leading-relaxed bg-rose-50/70 p-3.5 rounded-2xl border border-rose-200">
+            Are you sure you want to log out of your <strong>{currentRoleCfg.title}</strong> session? You will lose active session controls and return to Public Citizen Mode.
+          </p>
 
-            <div className="flex gap-2.5 pt-2 text-xs font-bold">
-              <button
-                type="button"
-                onClick={() => setShowLogoutConfirmModal(false)}
-                className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  logoutRole();
-                  setShowLogoutConfirmModal(false);
-                }}
-                className="flex-1 bg-rose-600 hover:bg-rose-500 text-white py-3 rounded-xl shadow-md shadow-rose-600/20 flex items-center justify-center gap-1.5 transition-all"
-              >
-                <UserCheck className="w-4 h-4" />
-                <span>Confirm Logout</span>
-              </button>
-            </div>
+          <div className="flex gap-2.5 pt-2 text-xs font-bold">
+            <button
+              type="button"
+              onClick={() => setShowLogoutConfirmModal(false)}
+              className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                logoutRole();
+                setShowLogoutConfirmModal(false);
+              }}
+              className="flex-1 bg-rose-600 hover:bg-rose-500 text-white py-3 rounded-xl shadow-md shadow-rose-600/20 flex items-center justify-center gap-1.5 transition-all"
+            >
+              <UserCheck className="w-4 h-4" />
+              <span>Confirm Logout</span>
+            </button>
           </div>
         </div>
-      )}
-    </header>
+      </div>
+    )}
+  </>
   );
 };

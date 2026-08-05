@@ -134,8 +134,8 @@ export const SosModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white border border-pink-200 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150 text-slate-900">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm min-h-screen overflow-y-auto">
+      <div className="bg-white border border-pink-200 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150 text-slate-900">
         {/* Header */}
         <div className="bg-gradient-to-r from-rose-500 via-pink-600 to-rose-600 p-5 text-white flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
