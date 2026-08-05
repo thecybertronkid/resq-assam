@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ASSAM_DISTRICTS } from '../../utils/mockData';
 import { Volunteer, IncidentReport } from '../../types';
-import { 
-  UserCheck, 
-  MapPin, 
-  CheckCircle, 
-  ShieldCheck, 
-  Award, 
-  Activity, 
-  Plus, 
+import {
+  UserCheck,
+  MapPin,
+  CheckCircle,
+  ShieldCheck,
+  Award,
+  Activity,
+  Plus,
   Radio,
   Clock,
   X,
@@ -31,17 +31,17 @@ import {
 } from 'lucide-react';
 
 export const VolunteerDashboard: React.FC = () => {
-  const { 
-    volunteers, 
-    addVolunteer, 
-    verifyVolunteer, 
-    updateVolunteerLocation, 
-    incidents, 
-    updateIncidentStatus, 
+  const {
+    volunteers,
+    addVolunteer,
+    verifyVolunteer,
+    updateVolunteerLocation,
+    incidents,
+    updateIncidentStatus,
     authenticatedRole,
     authenticatedVolunteerId,
     setIsAuthModalOpen,
-    showToast 
+    showToast
   } = useApp();
 
   const [activePortalTab, setActivePortalTab] = useState<'roster' | 'verified_portal'>('verified_portal');
@@ -173,8 +173,8 @@ export const VolunteerDashboard: React.FC = () => {
     if (revenueCircle.trim()) areaParts.push(`Circle: ${revenueCircle.trim()}`);
     if (localArea.trim()) areaParts.push(`Village/Ward: ${localArea.trim()}`);
 
-    const compiledServiceableArea = areaParts.length > 0 
-      ? areaParts.join(' • ') 
+    const compiledServiceableArea = areaParts.length > 0
+      ? areaParts.join(' • ')
       : (serviceableArea || `${district} Central Sector`);
 
     const chosenPassword = regPassword || 'vol123';
@@ -206,14 +206,14 @@ export const VolunteerDashboard: React.FC = () => {
   };
 
   // Check if current user has permission to access the Verified Responder Portal
-  const canAccessVerifiedPortal = 
-    authenticatedRole === 'admin' || 
-    authenticatedRole === 'rescue' || 
-    authenticatedRole === 'ngo' || 
+  const canAccessVerifiedPortal =
+    authenticatedRole === 'admin' ||
+    authenticatedRole === 'rescue' ||
+    authenticatedRole === 'ngo' ||
     (authenticatedRole === 'volunteer' && authenticatedVolunteerId);
 
   // Local missions for active responder
-  const localMissions = incidents.filter(i => 
+  const localMissions = incidents.filter(i =>
     i.district === (activeVerifiedVol?.district || 'Sivasagar') && i.status !== 'completed'
   );
 
@@ -234,11 +234,10 @@ export const VolunteerDashboard: React.FC = () => {
         <div className="flex items-center gap-2 bg-white/80 backdrop-blur p-1.5 rounded-2xl border border-emerald-300 shadow-xs">
           <button
             onClick={() => setActivePortalTab('verified_portal')}
-            className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all ${
-              activePortalTab === 'verified_portal'
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all ${activePortalTab === 'verified_portal'
                 ? 'bg-emerald-600 text-white shadow-sm'
                 : 'text-slate-700 hover:bg-emerald-50'
-            }`}
+              }`}
           >
             <ShieldCheck className="w-4 h-4 text-emerald-300" />
             <span>Verified Responder Portal</span>
@@ -251,11 +250,10 @@ export const VolunteerDashboard: React.FC = () => {
 
           <button
             onClick={() => setActivePortalTab('roster')}
-            className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all ${
-              activePortalTab === 'roster'
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all ${activePortalTab === 'roster'
                 ? 'bg-slate-900 text-white shadow-sm'
                 : 'text-slate-700 hover:bg-slate-100'
-            }`}
+              }`}
           >
             <Plus className="w-4 h-4 text-slate-400" />
             <span>Volunteer Form & Roster ({volunteers.length})</span>
@@ -535,8 +533,8 @@ export const VolunteerDashboard: React.FC = () => {
                 <Key className="w-4 h-4 text-emerald-600" /> Credentials to Access Portal:
               </div>
               <div>• <strong>Registered Volunteer:</strong> Use your auto-generated ID (e.g. <code>VOL-SIVA-0001</code>) & Password</div>
-              <div>• <strong>NDRF Rescue Passcode:</strong> <code>ndrf2026</code></div>
-              <div>• <strong>Admin Master Passcode:</strong> <code>admin123</code></div>
+              {/* <div>• <strong>NDRF Rescue Passcode:</strong> <code>ndrf2026</code></div> */}
+              {/* <div>• <strong>Admin Master Passcode:</strong> <code>admin123</code></div> */}
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
@@ -725,11 +723,10 @@ export const VolunteerDashboard: React.FC = () => {
                         <div
                           key={sk.id}
                           onClick={() => toggleSkill(sk.id)}
-                          className={`p-2.5 rounded-xl border cursor-pointer font-bold text-xs transition-all flex items-center justify-between ${
-                            isSelected
+                          className={`p-2.5 rounded-xl border cursor-pointer font-bold text-xs transition-all flex items-center justify-between ${isSelected
                               ? 'bg-emerald-50 border-emerald-400 text-emerald-900 shadow-2xs'
                               : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-emerald-300'
-                          }`}
+                            }`}
                         >
                           <span>{sk.label}</span>
                           {isSelected && <Check className="w-4 h-4 text-emerald-600" />}
@@ -748,9 +745,8 @@ export const VolunteerDashboard: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsAvailable(!isAvailable)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all ${
-                      isAvailable ? 'bg-emerald-600 text-white' : 'bg-slate-300 text-slate-700'
-                    }`}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all ${isAvailable ? 'bg-emerald-600 text-white' : 'bg-slate-300 text-slate-700'
+                      }`}
                   >
                     <span>{isAvailable ? '🟢 ON-DUTY READY' : '⚪ OFF-DUTY'}</span>
                   </button>
@@ -807,9 +803,8 @@ export const VolunteerDashboard: React.FC = () => {
                       </span>
                     </div>
 
-                    <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${
-                      vol.available ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'
-                    }`}>
+                    <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${vol.available ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'
+                      }`}>
                       {vol.available ? '🟢 On-Duty' : '⚪ Off-Duty'}
                     </span>
                   </div>
