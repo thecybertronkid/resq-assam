@@ -64,6 +64,7 @@ interface AppContextType {
   updateCampOccupancy: (campId: string, occupancy: number) => void;
   addVolunteer: (vol: Omit<Volunteer, 'id' | 'isVerified' | 'tasksAssigned'>) => void;
   verifyVolunteer: (volId: string) => void;
+  deleteVolunteer: (volId: string) => void;
   updateVolunteerLocation: (volId: string, lat: number, lng: number) => void;
   addNGO: (ngo: NGOInventory) => void;
   updateNgoStock: (ngoId: string, itemKey: keyof NGOInventory['items'], quantity: number) => void;
@@ -393,6 +394,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`✅ Admin verified volunteer credential for ${volId}! Saved to Supabase database.`);
   };
 
+  const deleteVolunteer = (volId: string) => {
+    const volName = volunteers.find(v => v.id === volId)?.name || volId;
+    setVolunteers(prev => prev.filter(v => v.id !== volId));
+    dbService.deleteVolunteer(volId);
+    showToast(`🗑️ Volunteer "${volName}" (${volId}) permanently deleted from system database.`);
+  };
+
   const updateVolunteerLocation = (volId: string, lat: number, lng: number) => {
     setVolunteers(prev => prev.map(v => {
       if (v.id === volId) {
@@ -502,6 +510,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateCampOccupancy,
         addVolunteer,
         verifyVolunteer,
+        deleteVolunteer,
         updateVolunteerLocation,
         addNGO,
         updateNgoStock,

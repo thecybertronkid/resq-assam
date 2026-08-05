@@ -109,6 +109,22 @@ class DatabaseService {
     }
   }
 
+  // Generic Delete Item
+  async deleteItem(storeName: string, id: string): Promise<void> {
+    try {
+      const db = await this.getDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const req = store.delete(id);
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+      });
+    } catch (err) {
+      console.error(`DB Delete error in ${storeName}:`, err);
+    }
+  }
+
   // Incidents CRUD
   async saveIncident(incident: IncidentReport): Promise<void> {
     return this.saveItem('incidents', incident);
@@ -128,6 +144,9 @@ class DatabaseService {
   // Volunteers CRUD
   async saveVolunteer(vol: Volunteer): Promise<void> {
     return this.saveItem('volunteers', vol);
+  }
+  async deleteVolunteer(id: string): Promise<void> {
+    return this.deleteItem('volunteers', id);
   }
   async getVolunteers(): Promise<Volunteer[]> {
     return this.getAllItems<Volunteer>('volunteers');
