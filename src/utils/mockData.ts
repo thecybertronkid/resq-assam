@@ -11,40 +11,7 @@ export const INITIAL_INCIDENTS: IncidentReport[] = [];
 
 export const INITIAL_RELIEF_CAMPS: ReliefCamp[] = [];
 
-export const INITIAL_VOLUNTEERS: Volunteer[] = [
-  {
-    id: 'VOL-SIVA-0001',
-    userId: 'VOL-SIVA-0001',
-    password: 'vol123',
-    name: 'Biren Gogoi',
-    phone: '+91 98540 12345',
-    email: 'biren.gogoi@resq.org',
-    district: 'Sivasagar',
-    serviceableArea: 'Sub-Div: Sivasagar Sadar • Circle: Amguri • Village/Ward: Disangmukh GP',
-    skills: ['swimmer', 'boat_operator', 'doctor'],
-    available: true,
-    isVerified: true,
-    lat: 26.9826,
-    lng: 94.6425,
-    tasksAssigned: 3
-  },
-  {
-    id: 'VOL-JORH-0001',
-    userId: 'VOL-JORH-0001',
-    password: 'vol123',
-    name: 'Pranjal Saikia',
-    phone: '+91 94350 67890',
-    email: 'pranjal.s@resq.org',
-    district: 'Jorhat',
-    serviceableArea: 'Sub-Div: Jorhat Sadar • Circle: Teok • Village/Ward: Titabor Ward 2',
-    skills: ['nurse', 'driver', 'logistics'],
-    available: true,
-    isVerified: true,
-    lat: 26.7509,
-    lng: 94.2037,
-    tasksAssigned: 5
-  }
-];
+export const INITIAL_VOLUNTEERS: Volunteer[] = [];
 
 export const INITIAL_NGO_INVENTORIES: NGOInventory[] = [];
 

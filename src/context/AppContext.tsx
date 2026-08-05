@@ -60,8 +60,10 @@ interface AppContextType {
 
   submitSosReport: (report: Partial<IncidentReport>) => void;
   updateIncidentStatus: (id: string, status: IncidentReport['status'], teamId?: string, teamName?: string, rescuePhotoProof?: string) => void;
+  deleteIncident: (id: string) => void;
   addCamp: (camp: ReliefCamp) => void;
   updateCampOccupancy: (campId: string, occupancy: number) => void;
+  deleteCamp: (id: string) => void;
   addVolunteer: (vol: Omit<Volunteer, 'isVerified' | 'tasksAssigned'> & { id?: string }) => void;
   verifyVolunteer: (volId: string) => void;
   deleteVolunteer: (volId: string) => void;
@@ -69,8 +71,11 @@ interface AppContextType {
   addNGO: (ngo: NGOInventory) => void;
   updateNgoStock: (ngoId: string, itemKey: keyof NGOInventory['items'], quantity: number) => void;
   addMissingPerson: (person: Omit<MissingPerson, 'id'>) => void;
+  deleteMissingPerson: (id: string) => void;
   addRoadReport: (report: Omit<RoadReport, 'id' | 'reportedAt'>) => void;
+  deleteRoadReport: (id: string) => void;
   addDonation: (donation: Omit<Donation, 'id' | 'receiptNo' | 'timestamp'>) => void;
+  resetPlatformData: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -465,6 +470,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`🚧 Road obstacle report for "${newRoad.roadName}" published & saved to database!`);
   };
 
+  const deleteIncident = (id: string) => {
+    setIncidents(prev => prev.filter(i => i.id !== id));
+    dbService.deleteIncident(id);
+    showToast(`🗑️ Emergency incident ${id} deleted by Admin.`);
+  };
+
+  const deleteCamp = (id: string) => {
+    setCamps(prev => prev.filter(c => c.id !== id));
+    dbService.deleteCamp(id);
+    showToast(`🗑️ Relief Camp ${id} closed & deleted by Admin.`);
+  };
+
+  const deleteMissingPerson = (id: string) => {
+    setMissingPersons(prev => prev.filter(p => p.id !== id));
+    dbService.deleteMissingPerson(id);
+    showToast(`🗑️ Missing person report ${id} removed.`);
+  };
+
+  const deleteRoadReport = (id: string) => {
+    setRoadReports(prev => prev.filter(r => r.id !== id));
+    dbService.deleteRoadReport(id);
+    showToast(`🗑️ Road report ${id} deleted.`);
+  };
+
+  const resetPlatformData = () => {
+    setIncidents([]);
+    setCamps([]);
+    setVolunteers([]);
+    setNgos([]);
+    setMissingPersons([]);
+    setRoadReports([]);
+    setDonations([]);
+    dbService.clearAllData();
+    showToast('🧹 Platform data reset! All records purged cleanly.');
+  };
+
   const addDonation = (donationData: Omit<Donation, 'id' | 'receiptNo' | 'timestamp'>) => {
     const newDonation: Donation = {
       ...donationData,
@@ -511,8 +552,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         logoutRole,
         submitSosReport,
         updateIncidentStatus,
+        deleteIncident,
         addCamp,
         updateCampOccupancy,
+        deleteCamp,
         addVolunteer,
         verifyVolunteer,
         deleteVolunteer,
@@ -520,8 +563,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addNGO,
         updateNgoStock,
         addMissingPerson,
+        deleteMissingPerson,
         addRoadReport,
-        addDonation
+        deleteRoadReport,
+        addDonation,
+        resetPlatformData
       }}
     >
       {children}

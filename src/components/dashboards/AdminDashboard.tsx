@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ASSAM_DISTRICTS } from '../../utils/mockData';
-import { Volunteer } from '../../types';
+import { Volunteer, IncidentReport, ReliefCamp, NGOInventory } from '../../types';
 import { 
   ShieldAlert, 
   Sparkles, 
@@ -23,21 +23,56 @@ import {
   Key,
   Phone,
   MapPin,
-  X
+  X,
+  Activity,
+  Tent,
+  Package,
+  Heart,
+  RefreshCcw,
+  Check,
+  Plus,
+  CheckSquare
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
-  const { incidents, volunteers, camps, verifyVolunteer, deleteVolunteer, showToast } = useApp();
+  const { 
+    incidents, 
+    volunteers, 
+    camps, 
+    ngos,
+    missingPersons,
+    roadReports,
+    donations,
+    updateIncidentStatus,
+    deleteIncident,
+    verifyVolunteer, 
+    deleteVolunteer, 
+    updateCampOccupancy,
+    deleteCamp,
+    deleteMissingPerson,
+    deleteRoadReport,
+    resetPlatformData,
+    showToast 
+  } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'duplicates' | 'volunteers' | 'heatmap'>('volunteers');
+  const [activeTab, setActiveTab] = useState<'incidents' | 'volunteers' | 'camps' | 'ngos' | 'heatmap'>('volunteers');
+
+  // Search & Filters
   const [volunteerSearch, setVolunteerSearch] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('ALL');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<'ALL' | 'VERIFIED' | 'PENDING'>('ALL');
+  const [incidentSeverityFilter, setIncidentSeverityFilter] = useState<string>('ALL');
 
-  // Deletion modal state
+  // Deletion modal states
   const [volToDelete, setVolToDelete] = useState<Volunteer | null>(null);
+  const [incidentToDelete, setIncidentToDelete] = useState<IncidentReport | null>(null);
+  const [campToDelete, setCampToDelete] = useState<ReliefCamp | null>(null);
+  const [showResetConfirmModal, setShowResetConfirmModal] = useState(false);
 
   const duplicateIncidents = incidents.filter(i => i.isAiDuplicate);
+  const activeIncidents = incidents.filter(i => i.status !== 'completed' && i.status !== 'cancelled');
+  const resolvedIncidents = incidents.filter(i => i.status === 'completed');
+  const totalDonationsAmount = donations.reduce((sum, d) => sum + (d.amount || 0), 0);
 
   // Volunteer filtering
   const filteredVolunteers = volunteers.filter(v => {
@@ -57,15 +92,12 @@ export const AdminDashboard: React.FC = () => {
     return matchesSearch && matchesDistrict && matchesStatus;
   });
 
-  const handleApproveVolunteer = (volId: string) => {
-    verifyVolunteer(volId);
-  };
-
-  const handleDeleteVolunteerConfirm = () => {
-    if (!volToDelete) return;
-    deleteVolunteer(volToDelete.id);
-    setVolToDelete(null);
-  };
+  // Incident filtering
+  const filteredIncidents = incidents.filter(i => {
+    const matchesDistrict = selectedDistrict === 'ALL' || i.district === selectedDistrict;
+    const matchesSeverity = incidentSeverityFilter === 'ALL' || i.severity === incidentSeverityFilter;
+    return matchesDistrict && matchesSeverity;
+  });
 
   const handleExportStatewideReport = () => {
     const headers = ['Incident ID', 'District', 'Village', 'Disaster Type', 'Severity', 'AI Score', 'Status', 'Children', 'Elderly', 'Pregnant'];
@@ -94,93 +126,132 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
-      {/* Header */}
+      {/* Supreme Command Header */}
       <div className="bg-gradient-to-r from-amber-100 via-pink-50 to-emerald-100 border border-amber-200 p-6 rounded-3xl flex flex-wrap items-center justify-between gap-4 shadow-sm">
         <div>
-          <span className="text-xs uppercase font-extrabold text-amber-800 tracking-wider flex items-center gap-1.5">
+          <span className="text-xs uppercase font-extrabold text-amber-900 tracking-wider flex items-center gap-1.5">
             <Radio className="w-4 h-4 text-amber-600 animate-pulse" />
-            STATEWIDE EMERGENCY COMMAND & AI MODERATION
+            SUPREME STATE DISASTER COMMAND CENTER • ASSAM
           </span>
-          <h1 className="text-2xl font-heading font-extrabold text-slate-900">Government Admin War Room</h1>
-          <p className="text-xs text-slate-600 font-medium">Manage & delete volunteers, verify credentials, resolve AI duplicate flags, and export CSV reports.</p>
+          <h1 className="text-2xl font-heading font-extrabold text-slate-900">Supreme Admin War Room</h1>
+          <p className="text-xs text-slate-600 font-medium">Supreme operational control body: Manage dispatches, verify/delete volunteers, audit warehouses & reset live platform data.</p>
         </div>
 
-        <button
-          onClick={handleExportStatewideReport}
-          className="bg-amber-600 hover:bg-amber-500 text-white font-extrabold px-5 py-2.5 rounded-xl shadow-md shadow-amber-500/20 text-xs flex items-center gap-2 transition-all"
-        >
-          <FileSpreadsheet className="w-4 h-4" />
-          Export Statewide Disaster CSV Report
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportStatewideReport}
+            className="bg-amber-600 hover:bg-amber-500 text-white font-extrabold px-4 py-2.5 rounded-xl shadow-md text-xs flex items-center gap-2 transition-all"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Export CSV
+          </button>
+
+          <button
+            onClick={() => setShowResetConfirmModal(true)}
+            className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-extrabold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 transition-all"
+            title="Reset platform data cleanly to start fresh"
+          >
+            <RefreshCcw className="w-4 h-4 text-rose-600" />
+            Reset Data Fresh
+          </button>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-slate-200 space-x-6 text-xs font-bold">
+      {/* Supreme KPI Telemetry Counter Bar */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+          <span className="text-[10px] text-slate-500 font-extrabold uppercase">Total SOS Logged</span>
+          <div className="text-2xl font-extrabold text-slate-900">{incidents.length}</div>
+          <span className="text-[10px] text-rose-600 font-bold block">{activeIncidents.length} Active • {resolvedIncidents.length} Done</span>
+        </div>
+
+        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+          <span className="text-[10px] text-slate-500 font-extrabold uppercase">Volunteer Force</span>
+          <div className="text-2xl font-extrabold text-slate-900">{volunteers.length}</div>
+          <span className="text-[10px] text-emerald-600 font-bold block">{volunteers.filter(v => v.isVerified).length} Verified Rescuers</span>
+        </div>
+
+        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+          <span className="text-[10px] text-slate-500 font-extrabold uppercase">Relief Camps</span>
+          <div className="text-2xl font-extrabold text-slate-900">{camps.length}</div>
+          <span className="text-[10px] text-purple-600 font-bold block">{camps.reduce((acc, c) => acc + c.currentOccupancy, 0)} Evacuees</span>
+        </div>
+
+        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+          <span className="text-[10px] text-slate-500 font-extrabold uppercase">NGO Hubs</span>
+          <div className="text-2xl font-extrabold text-slate-900">{ngos.length}</div>
+          <span className="text-[10px] text-sky-600 font-bold block">Relief Inventories Active</span>
+        </div>
+
+        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+          <span className="text-[10px] text-slate-500 font-extrabold uppercase">Missing / Hazards</span>
+          <div className="text-2xl font-extrabold text-slate-900">{missingPersons.length + roadReports.length}</div>
+          <span className="text-[10px] text-amber-600 font-bold block">{missingPersons.length} Missing • {roadReports.length} Blocked Roads</span>
+        </div>
+
+        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-1">
+          <span className="text-[10px] text-slate-500 font-extrabold uppercase">Relief Funds</span>
+          <div className="text-2xl font-extrabold text-emerald-700">₹{totalDonationsAmount.toLocaleString()}</div>
+          <span className="text-[10px] text-emerald-600 font-bold block">{donations.length} 80G Contributions</span>
+        </div>
+      </div>
+
+      {/* Tabs Bar */}
+      <div className="flex border-b border-slate-200 space-x-6 text-xs font-bold overflow-x-auto pb-1">
         <button
           onClick={() => setActiveTab('volunteers')}
-          className={`pb-3 flex items-center gap-2 transition-all ${
+          className={`pb-3 flex items-center gap-2 whitespace-nowrap transition-all ${
             activeTab === 'volunteers' ? 'text-emerald-700 border-b-2 border-emerald-600 font-extrabold text-sm' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
           <Users className="w-4 h-4" />
-          Volunteer Management & Approvals ({volunteers.length})
+          Volunteer Corps ({volunteers.length})
         </button>
+
         <button
-          onClick={() => setActiveTab('duplicates')}
-          className={`pb-3 flex items-center gap-2 transition-all ${
-            activeTab === 'duplicates' ? 'text-pink-600 border-b-2 border-pink-500 font-extrabold text-sm' : 'text-slate-500 hover:text-slate-800'
+          onClick={() => setActiveTab('incidents')}
+          className={`pb-3 flex items-center gap-2 whitespace-nowrap transition-all ${
+            activeTab === 'incidents' ? 'text-rose-600 border-b-2 border-rose-500 font-extrabold text-sm' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
-          <Sparkles className="w-4 h-4" />
-          AI Duplicate Flags ({duplicateIncidents.length})
+          <Activity className="w-4 h-4" />
+          Emergency Dispatches ({incidents.length})
         </button>
+
+        <button
+          onClick={() => setActiveTab('camps')}
+          className={`pb-3 flex items-center gap-2 whitespace-nowrap transition-all ${
+            activeTab === 'camps' ? 'text-purple-600 border-b-2 border-purple-500 font-extrabold text-sm' : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Tent className="w-4 h-4" />
+          Relief Camps ({camps.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('ngos')}
+          className={`pb-3 flex items-center gap-2 whitespace-nowrap transition-all ${
+            activeTab === 'ngos' ? 'text-sky-600 border-b-2 border-sky-500 font-extrabold text-sm' : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Package className="w-4 h-4" />
+          NGO Warehouses ({ngos.length})
+        </button>
+
         <button
           onClick={() => setActiveTab('heatmap')}
-          className={`pb-3 flex items-center gap-2 transition-all ${
-            activeTab === 'heatmap' ? 'text-sky-600 border-b-2 border-sky-500 font-extrabold text-sm' : 'text-slate-500 hover:text-slate-800'
+          className={`pb-3 flex items-center gap-2 whitespace-nowrap transition-all ${
+            activeTab === 'heatmap' ? 'text-amber-600 border-b-2 border-amber-500 font-extrabold text-sm' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
           <BarChart3 className="w-4 h-4" />
-          District Triage Overview
+          District Radar Overview
         </button>
       </div>
 
       {/* TAB 1: VOLUNTEER MANAGEMENT & DELETION */}
       {activeTab === 'volunteers' && (
         <div className="space-y-6">
-          {/* Volunteer Telemetry Summary Counter Bar */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-[10px] text-slate-500 font-extrabold uppercase">Total Registered Volunteers</span>
-                <div className="text-2xl font-extrabold text-slate-900 mt-0.5">{volunteers.length}</div>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
-                <Users className="w-5 h-5" />
-              </div>
-            </div>
-
-            <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-[10px] text-emerald-800 font-extrabold uppercase">Active Verified Rescuers</span>
-                <div className="text-2xl font-extrabold text-emerald-900 mt-0.5">{volunteers.filter(v => v.isVerified).length}</div>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-            </div>
-
-            <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-[10px] text-amber-800 font-extrabold uppercase">Pending Verification</span>
-                <div className="text-2xl font-extrabold text-amber-900 mt-0.5">{volunteers.filter(v => !v.isVerified).length}</div>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700">
-                <Clock className="w-5 h-5" />
-              </div>
-            </div>
-          </div>
-
           {/* Filters & Search Controls */}
           <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
             <div className="relative flex-1 min-w-[220px]">
@@ -220,8 +291,12 @@ export const AdminDashboard: React.FC = () => {
 
           {/* Volunteer Roster Table / Card List */}
           {filteredVolunteers.length === 0 ? (
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center text-slate-600 text-xs font-semibold">
-              No volunteers match the current search or filter criteria.
+            <div className="bg-white p-12 rounded-3xl border border-slate-200 shadow-sm text-center space-y-3">
+              <Users className="w-10 h-10 text-slate-400 mx-auto" />
+              <h3 className="font-extrabold text-slate-800 text-sm">No Volunteers Registered</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">
+                The volunteer roster is completely fresh. Once citizens apply or register on the platform, their records will appear here for Admin verification and management.
+              </p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -261,11 +336,6 @@ export const AdminDashboard: React.FC = () => {
                           {sk.replace('_', ' ').toUpperCase()}
                         </span>
                       ))}
-                      {v.tasksAssigned > 0 && (
-                        <span className="bg-purple-100 text-purple-800 text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-purple-300">
-                          Missions Completed: {v.tasksAssigned}
-                        </span>
-                      )}
                     </div>
                   </div>
 
@@ -273,7 +343,7 @@ export const AdminDashboard: React.FC = () => {
                   <div className="flex items-center gap-2 shrink-0">
                     {!v.isVerified ? (
                       <button
-                        onClick={() => handleApproveVolunteer(v.id)}
+                        onClick={() => verifyVolunteer(v.id)}
                         className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-3.5 py-2 rounded-xl text-xs shadow-xs flex items-center gap-1.5 transition-all"
                       >
                         <ShieldCheck className="w-4 h-4" /> Verify Credential
@@ -284,7 +354,6 @@ export const AdminDashboard: React.FC = () => {
                       </span>
                     )}
 
-                    {/* Delete Volunteer Button */}
                     <button
                       onClick={() => setVolToDelete(v)}
                       className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-extrabold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-all"
@@ -301,44 +370,82 @@ export const AdminDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 2: AI DUPLICATE FLAGS */}
-      {activeTab === 'duplicates' && (
+      {/* TAB 2: EMERGENCY INCIDENTS & DISPATCH CONTROL */}
+      {activeTab === 'incidents' && (
         <div className="space-y-4">
-          <p className="text-xs text-slate-600 font-medium">
-            AI Computer Vision & NLP Engine flags duplicate emergency submissions from identical GPS locations within 30 minutes.
-          </p>
+          <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
+            <span className="font-extrabold text-slate-900">Filter Dispatches by District & Severity:</span>
+            <div className="flex items-center gap-2">
+              <select
+                value={selectedDistrict}
+                onChange={e => setSelectedDistrict(e.target.value)}
+                className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-bold"
+              >
+                <option value="ALL">All Active Districts</option>
+                {ASSAM_DISTRICTS.map(d => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
 
-          {duplicateIncidents.length === 0 ? (
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center text-slate-600 text-xs font-semibold">
-              ✅ No duplicate emergency flags in queue. All incoming SOS calls are unique.
+              <select
+                value={incidentSeverityFilter}
+                onChange={e => setIncidentSeverityFilter(e.target.value)}
+                className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-bold"
+              >
+                <option value="ALL">All Severities</option>
+                <option value="critical">🔴 Critical</option>
+                <option value="high">🟠 High</option>
+                <option value="medium">🟡 Medium</option>
+                <option value="low">🟢 Low</option>
+              </select>
+            </div>
+          </div>
+
+          {filteredIncidents.length === 0 ? (
+            <div className="bg-white p-12 rounded-3xl border border-slate-200 shadow-sm text-center space-y-3">
+              <Activity className="w-10 h-10 text-slate-400 mx-auto" />
+              <h3 className="font-extrabold text-slate-800 text-sm">No Emergency Dispatches Logged</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">
+                The incident queue is completely clean and fresh. When citizens submit emergency SOS calls, dispatches will appear here for Admin command triage.
+              </p>
             </div>
           ) : (
             <div className="space-y-3">
-              {duplicateIncidents.map(inc => (
-                <div key={inc.id} className="bg-white p-4 rounded-3xl border border-amber-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded border border-amber-300">
-                        AI Duplicate Cluster {inc.duplicateMatchedId ? `#${inc.duplicateMatchedId}` : ''}
+              {filteredIncidents.map(inc => (
+                <div key={inc.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4 hover:border-rose-300 transition-all">
+                  <div className="space-y-1 max-w-xl">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-mono text-xs font-extrabold text-slate-900">{inc.id}</span>
+                      <span className="bg-rose-100 text-rose-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded border border-rose-300 uppercase">
+                        {inc.disasterType}
                       </span>
-                      <span className="text-xs text-slate-500 font-bold">{inc.id}</span>
+                      <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded uppercase border ${
+                        inc.severity === 'critical' ? 'bg-rose-600 text-white border-rose-700' : 'bg-amber-100 text-amber-800 border-amber-300'
+                      }`}>
+                        {inc.severity}
+                      </span>
                     </div>
+
                     <h4 className="font-bold text-slate-900 text-sm">{inc.village}, {inc.district}</h4>
-                    <p className="text-xs text-slate-600">{inc.description}</p>
+                    <p className="text-xs text-slate-600 font-medium">{inc.description}</p>
+                    <span className="text-[11px] text-slate-500 block font-semibold">
+                      Reporter: {inc.reporterName} ({inc.reporterPhone}) • AI Score: <strong>{inc.aiVulnerabilityScore}</strong>
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0">
                     <button
-                      onClick={() => showToast(`Merged duplicate report ${inc.id} into primary cluster!`)}
-                      className="bg-purple-600 hover:bg-purple-500 text-white font-bold px-3 py-1.5 rounded-xl text-xs shadow-xs"
+                      onClick={() => updateIncidentStatus(inc.id, 'completed')}
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1"
                     >
-                      Merge Duplicate
+                      <Check className="w-3.5 h-3.5" /> Resolve
                     </button>
+
                     <button
-                      onClick={() => showToast(`Approved report ${inc.id} as unique emergency!`)}
-                      className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs border border-slate-200"
+                      onClick={() => setIncidentToDelete(inc)}
+                      className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1"
                     >
-                      Dismiss Flag
+                      <Trash2 className="w-3.5 h-3.5 text-rose-600" /> Delete
                     </button>
                   </div>
                 </div>
@@ -348,24 +455,108 @@ export const AdminDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 3: DISTRICT BREAKDOWN */}
+      {/* TAB 3: RELIEF CAMPS */}
+      {activeTab === 'camps' && (
+        <div className="space-y-4">
+          {camps.length === 0 ? (
+            <div className="bg-white p-12 rounded-3xl border border-slate-200 shadow-sm text-center space-y-3">
+              <Tent className="w-10 h-10 text-slate-400 mx-auto" />
+              <h3 className="font-extrabold text-slate-800 text-sm">No Active Relief Camps</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">
+                Relief camps list is completely fresh. Add new relief camps in the Relief Camps module to start managing evacuee shelter capacities.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {camps.map(camp => (
+                <div key={camp.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="text-[10px] text-slate-500 font-bold uppercase">{camp.district}</span>
+                      <h4 className="font-bold text-slate-900 text-base">{camp.name}</h4>
+                      <p className="text-xs text-slate-600 font-medium">GPS: ({camp.lat}, {camp.lng})</p>
+                    </div>
+                    <button
+                      onClick={() => setCampToDelete(camp)}
+                      className="text-rose-600 hover:text-rose-800 p-1.5 rounded-xl hover:bg-rose-50 border border-rose-200"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex justify-between items-center text-xs font-semibold">
+                    <span>Occupancy: <strong>{camp.currentOccupancy} / {camp.capacity}</strong></span>
+                    <span className="text-emerald-700 font-bold">In-Charge: {camp.inCharge}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 4: NGO WAREHOUSES */}
+      {activeTab === 'ngos' && (
+        <div className="space-y-4">
+          {ngos.length === 0 ? (
+            <div className="bg-white p-12 rounded-3xl border border-slate-200 shadow-sm text-center space-y-3">
+              <Package className="w-10 h-10 text-slate-400 mx-auto" />
+              <h3 className="font-extrabold text-slate-800 text-sm">No Registered NGO Warehouses</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">
+                NGO relief inventory list is fresh. Register NGO hubs in the NGO module to track food packs, water bottles, and trauma kits.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {ngos.map(ngo => (
+                <div key={ngo.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+                  <div>
+                    <span className="text-[10px] text-slate-500 font-bold uppercase">{ngo.district}</span>
+                    <h4 className="font-bold text-slate-900 text-base">{ngo.ngoName}</h4>
+                    <p className="text-xs text-slate-600 font-medium">Contact: {ngo.contactPhone}</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
+                    <div className="bg-slate-50 p-2 rounded-xl border border-slate-200">🍲 Food Packs: <strong>{ngo.items.foodPacks}</strong></div>
+                    <div className="bg-slate-50 p-2 rounded-xl border border-slate-200">💧 Water Litres: <strong>{ngo.items.waterLitres} L</strong></div>
+                    <div className="bg-slate-50 p-2 rounded-xl border border-slate-200">🩺 Medicines: <strong>{ngo.items.medicines}</strong></div>
+                    <div className="bg-slate-50 p-2 rounded-xl border border-slate-200">🛌 Blankets: <strong>{ngo.items.blankets}</strong></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 5: DISTRICT TRIAGE RADAR */}
       {activeTab === 'heatmap' && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {ASSAM_DISTRICTS.map((dist) => {
             const incCount = incidents.filter(inc => inc.district === dist).length;
             const campCount = camps.filter(c => c.district === dist).length;
             const volCount = volunteers.filter(v => v.district === dist).length;
             return (
-              <div key={dist} className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm space-y-2">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-bold text-slate-900 text-xs">{dist}</h4>
-                  <span className="text-[10px] bg-rose-100 text-rose-700 px-2 py-0.5 rounded font-bold border border-rose-300">
-                    {incCount} Incidents
+              <div key={dist} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                  <h4 className="font-heading font-extrabold text-slate-900 text-base">{dist} District</h4>
+                  <span className="text-xs bg-rose-100 text-rose-700 px-3 py-1 rounded-full font-extrabold border border-rose-300">
+                    {incCount} Active SOS Logged
                   </span>
                 </div>
-                <div className="text-[11px] text-slate-600 flex justify-between pt-1 border-t border-slate-100 font-medium">
-                  <span>Relief Camps: <strong>{campCount} Open</strong></span>
-                  <span className="text-emerald-700 font-bold">{volCount} Rescuers Active</span>
+                <div className="grid grid-cols-3 gap-2 text-xs text-slate-700 font-semibold text-center">
+                  <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+                    <span className="text-[10px] text-slate-500 block">Open Camps</span>
+                    <strong className="text-sm text-purple-700">{campCount}</strong>
+                  </div>
+                  <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+                    <span className="text-[10px] text-slate-500 block">Rescuers</span>
+                    <strong className="text-sm text-emerald-700">{volCount}</strong>
+                  </div>
+                  <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+                    <span className="text-[10px] text-slate-500 block">Status</span>
+                    <strong className="text-xs text-sky-700">ACTIVE RADAR</strong>
+                  </div>
                 </div>
               </div>
             );
@@ -373,49 +564,63 @@ export const AdminDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* DELETE VOLUNTEER CONFIRMATION MODAL */}
+      {/* DELETE VOLUNTEER MODAL */}
       {volToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 animate-in fade-in zoom-in-95 my-6">
+          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-6">
             <div className="flex items-center justify-between border-b border-rose-100 pb-3">
               <h3 className="font-heading font-extrabold text-base text-rose-700 flex items-center gap-2">
-                <Trash2 className="w-5 h-5 text-rose-600" />
-                Confirm Volunteer Deletion
+                <Trash2 className="w-5 h-5 text-rose-600" /> Confirm Volunteer Deletion
               </h3>
-              <button
-                onClick={() => setVolToDelete(null)}
-                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              <button onClick={() => setVolToDelete(null)} className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><X className="w-4 h-4" /></button>
+            </div>
+            <p className="text-xs text-slate-700 font-medium">Delete volunteer record for <strong>"{volToDelete.name}"</strong> ({volToDelete.id})?</p>
+            <div className="flex gap-2 pt-2 text-xs font-bold">
+              <button type="button" onClick={() => setVolToDelete(null)} className="flex-1 bg-slate-100 py-3 rounded-xl">Cancel</button>
+              <button type="button" onClick={() => { deleteVolunteer(volToDelete.id); setVolToDelete(null); }} className="flex-1 bg-rose-600 text-white py-3 rounded-xl">Delete Volunteer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE INCIDENT MODAL */}
+      {incidentToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white border border-rose-200 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-6">
+            <div className="flex items-center justify-between border-b border-rose-100 pb-3">
+              <h3 className="font-heading font-extrabold text-base text-rose-700 flex items-center gap-2">
+                <Trash2 className="w-5 h-5 text-rose-600" /> Confirm Incident Deletion
+              </h3>
+              <button onClick={() => setIncidentToDelete(null)} className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><X className="w-4 h-4" /></button>
+            </div>
+            <p className="text-xs text-slate-700 font-medium">Delete emergency SOS dispatch <strong>"{incidentToDelete.id}"</strong> from <strong>{incidentToDelete.village}</strong>?</p>
+            <div className="flex gap-2 pt-2 text-xs font-bold">
+              <button type="button" onClick={() => setIncidentToDelete(null)} className="flex-1 bg-slate-100 py-3 rounded-xl">Cancel</button>
+              <button type="button" onClick={() => { deleteIncident(incidentToDelete.id); setIncidentToDelete(null); }} className="flex-1 bg-rose-600 text-white py-3 rounded-xl">Delete Incident</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MASTER RESET CONFIRMATION MODAL */}
+      {showResetConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md overflow-y-auto">
+          <div className="bg-white border border-rose-300 w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 text-slate-900 my-6">
+            <div className="flex items-center gap-3 text-rose-600">
+              <AlertTriangle className="w-8 h-8 shrink-0" />
+              <div>
+                <h3 className="font-heading font-extrabold text-base text-slate-900">Master Platform Data Reset</h3>
+                <p className="text-xs text-slate-500">Purge all live records cleanly to start 100% fresh</p>
+              </div>
             </div>
 
-            <p className="text-xs text-slate-700 leading-relaxed font-medium">
-              Are you sure you want to permanently delete volunteer record for <strong>"{volToDelete.name}"</strong> ({volToDelete.id}) from <strong>{volToDelete.district}</strong>?
+            <p className="text-xs text-slate-700 font-medium leading-relaxed bg-rose-50 p-3 rounded-2xl border border-rose-200">
+              ⚠️ This will clear all submitted SOS dispatches, registered volunteers, relief camps, NGO stocks, missing persons, and road hazard reports from local and IndexedDB storage.
             </p>
 
-            <div className="bg-rose-50 p-3 rounded-2xl border border-rose-200 text-[11px] text-rose-800 font-semibold space-y-1">
-              <div>• User ID: <strong>{volToDelete.userId || 'N/A'}</strong></div>
-              <div>• Phone: <strong>{volToDelete.phone}</strong></div>
-              <div>• Serviceable Area: <strong>{volToDelete.serviceableArea || volToDelete.district}</strong></div>
-            </div>
-
             <div className="flex gap-2 pt-2 text-xs font-bold">
-              <button
-                type="button"
-                onClick={() => setVolToDelete(null)}
-                className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDeleteVolunteerConfirm}
-                className="flex-1 bg-rose-600 hover:bg-rose-500 text-white py-3 rounded-xl shadow-md shadow-rose-600/20 flex items-center justify-center gap-1.5"
-              >
-                <Trash2 className="w-4 h-4" />
-                <span>Delete Volunteer</span>
-              </button>
+              <button type="button" onClick={() => setShowResetConfirmModal(false)} className="flex-1 bg-slate-100 py-3 rounded-xl">Cancel</button>
+              <button type="button" onClick={() => { resetPlatformData(); setShowResetConfirmModal(false); }} className="flex-1 bg-rose-600 text-white py-3 rounded-xl">Confirm Master Reset</button>
             </div>
           </div>
         </div>

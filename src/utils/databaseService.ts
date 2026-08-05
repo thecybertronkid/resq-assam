@@ -129,6 +129,9 @@ class DatabaseService {
   async saveIncident(incident: IncidentReport): Promise<void> {
     return this.saveItem('incidents', incident);
   }
+  async deleteIncident(id: string): Promise<void> {
+    return this.deleteItem('incidents', id);
+  }
   async getIncidents(): Promise<IncidentReport[]> {
     return this.getAllItems<IncidentReport>('incidents');
   }
@@ -136,6 +139,9 @@ class DatabaseService {
   // Relief Camps CRUD
   async saveCamp(camp: ReliefCamp): Promise<void> {
     return this.saveItem('camps', camp);
+  }
+  async deleteCamp(id: string): Promise<void> {
+    return this.deleteItem('camps', id);
   }
   async getCamps(): Promise<ReliefCamp[]> {
     return this.getAllItems<ReliefCamp>('camps');
@@ -164,6 +170,9 @@ class DatabaseService {
   async saveMissingPerson(person: MissingPerson): Promise<void> {
     return this.saveItem('missingPersons', person);
   }
+  async deleteMissingPerson(id: string): Promise<void> {
+    return this.deleteItem('missingPersons', id);
+  }
   async getMissingPersons(): Promise<MissingPerson[]> {
     return this.getAllItems<MissingPerson>('missingPersons');
   }
@@ -171,6 +180,9 @@ class DatabaseService {
   // Road Reports CRUD
   async saveRoadReport(report: RoadReport): Promise<void> {
     return this.saveItem('roadReports', report);
+  }
+  async deleteRoadReport(id: string): Promise<void> {
+    return this.deleteItem('roadReports', id);
   }
   async getRoadReports(): Promise<RoadReport[]> {
     return this.getAllItems<RoadReport>('roadReports');
@@ -190,6 +202,17 @@ class DatabaseService {
   }
   async getDonations(): Promise<Donation[]> {
     return this.getAllItems<Donation>('donations');
+  }
+
+  async clearAllData(): Promise<void> {
+    try {
+      const db = await this.getDB();
+      const storeNames = ['incidents', 'camps', 'volunteers', 'ngos', 'missingPersons', 'roadReports', 'alerts', 'donations'];
+      const tx = db.transaction(storeNames, 'readwrite');
+      storeNames.forEach(name => tx.objectStore(name).clear());
+    } catch (err) {
+      console.error('DB Clear error:', err);
+    }
   }
 }
 
