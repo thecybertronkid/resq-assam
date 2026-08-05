@@ -62,7 +62,7 @@ interface AppContextType {
   updateIncidentStatus: (id: string, status: IncidentReport['status'], teamId?: string, teamName?: string, rescuePhotoProof?: string) => void;
   addCamp: (camp: ReliefCamp) => void;
   updateCampOccupancy: (campId: string, occupancy: number) => void;
-  addVolunteer: (vol: Omit<Volunteer, 'id' | 'isVerified' | 'tasksAssigned'>) => void;
+  addVolunteer: (vol: Omit<Volunteer, 'isVerified' | 'tasksAssigned'> & { id?: string }) => void;
   verifyVolunteer: (volId: string) => void;
   deleteVolunteer: (volId: string) => void;
   updateVolunteerLocation: (volId: string, lat: number, lng: number) => void;
@@ -368,17 +368,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`📊 Updated camp occupancy for ${campId} to ${occupancy}!`);
   };
 
-  const addVolunteer = (volData: Omit<Volunteer, 'id' | 'isVerified' | 'tasksAssigned'>) => {
+  const addVolunteer = (volData: Omit<Volunteer, 'isVerified' | 'tasksAssigned'> & { id?: string }) => {
+    const distPrefix = (volData.district.replace(/[^a-zA-Z]/g, '').slice(0, 4) || 'SIVA').toUpperCase();
+    const count = volunteers.filter(v => v.district.toLowerCase() === volData.district.toLowerCase()).length + 1;
+    const generatedId = `VOL-${distPrefix}-${String(count).padStart(4, '0')}`;
+
     const newVol: Volunteer = {
       ...volData,
-      id: `VOL-${Math.floor(1000 + Math.random() * 9000)}`,
+      id: volData.id || generatedId,
+      userId: volData.userId || volData.id || generatedId,
       isVerified: false,
       tasksAssigned: 0
     };
     setVolunteers(prev => [newVol, ...prev]);
     dbService.saveVolunteer(newVol);
     supabaseClient.syncVolunteer(newVol);
-    showToast(`🦵 Volunteer application for ${newVol.name} submitted & synced to Supabase database! Pending Admin verification.`);
+    showToast(`🦵 Volunteer application for ${newVol.name} (${newVol.id}) submitted! Pending Admin verification.`);
   };
 
   const verifyVolunteer = (volId: string) => {

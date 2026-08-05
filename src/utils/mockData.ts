@@ -13,8 +13,8 @@ export const INITIAL_RELIEF_CAMPS: ReliefCamp[] = [];
 
 export const INITIAL_VOLUNTEERS: Volunteer[] = [
   {
-    id: 'VOL-101',
-    userId: 'vol_biren',
+    id: 'VOL-SIVA-0001',
+    userId: 'VOL-SIVA-0001',
     password: 'vol123',
     name: 'Biren Gogoi',
     phone: '+91 98540 12345',
@@ -29,8 +29,8 @@ export const INITIAL_VOLUNTEERS: Volunteer[] = [
     tasksAssigned: 3
   },
   {
-    id: 'VOL-102',
-    userId: 'vol_pranjal',
+    id: 'VOL-JORH-0001',
+    userId: 'VOL-JORH-0001',
     password: 'vol123',
     name: 'Pranjal Saikia',
     phone: '+91 94350 67890',
